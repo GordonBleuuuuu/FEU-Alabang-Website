@@ -158,12 +158,14 @@ export default function Leadership() {
         {/* Active batch header */}
         <div
           key={activeBatch.id}
-          className="mt-10 animate-fade-up rounded-3xl border border-feu-green/15 bg-gradient-to-br from-feu-green to-feu-teal p-6 text-white shadow-glass sm:p-8"
+          className="mt-10 animate-fade-up rounded-3xl border border-slate-200 bg-white p-6 shadow-card sm:p-8"
         >
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-3">
-                <h3 className="text-2xl font-black">{activeBatch.label}</h3>
+                <h3 className="text-2xl font-black text-ink">
+                  {activeBatch.label}
+                </h3>
                 {activeBatch.active && (
                   <span className="pill bg-gold text-feu-moss">
                     <Star className="h-3 w-3" />
@@ -171,16 +173,18 @@ export default function Leadership() {
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-gold">{activeBatch.sy}</p>
-              <p className="mt-2 max-w-xl text-sm text-white/80">
+              <p className="mt-1 font-semibold text-feu-green">
+                {activeBatch.sy}
+              </p>
+              <p className="mt-2 max-w-xl text-sm text-slate-600">
                 {activeBatch.tagline}
               </p>
             </div>
-            <div className="glass rounded-2xl px-5 py-3 text-center">
-              <div className="text-3xl font-black text-gold">
+            <div className="rounded-2xl border border-slate-200 bg-cloud px-5 py-3 text-center">
+              <div className="text-3xl font-black text-feu-green">
                 {activeBatch.officers.length}
               </div>
-              <div className="text-[0.7rem] uppercase tracking-wide text-white/70">
+              <div className="text-[0.7rem] uppercase tracking-wide text-slate-500">
                 Officers
               </div>
             </div>
