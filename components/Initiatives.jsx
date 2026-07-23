@@ -49,15 +49,19 @@ export default function Initiatives() {
             return (
               <div
                 key={item.label}
-                className="card-hover relative overflow-hidden rounded-3xl bg-gradient-to-br from-feu-green to-feu-teal p-6 text-white shadow-glass"
+                className="card-hover group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
               >
-                <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gold/10 blur-2xl" />
-                <Icon className="h-8 w-8 text-gold" />
-                <div className="mt-5 text-4xl font-black text-gold">
+                <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-feu-green/5 blur-2xl" />
+                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-feu-green/10 text-feu-green transition group-hover:bg-feu-green group-hover:text-gold">
+                  <Icon className="h-6 w-6" />
+                </span>
+                <div className="mt-5 text-4xl font-black text-feu-green">
                   {item.stat}
                 </div>
-                <div className="mt-1 text-sm font-bold">{item.label}</div>
-                <p className="mt-2 text-xs leading-relaxed text-white/70">
+                <div className="mt-1 text-sm font-bold text-ink">
+                  {item.label}
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-slate-600">
                   {item.detail}
                 </p>
               </div>
