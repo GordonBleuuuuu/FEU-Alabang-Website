@@ -42,6 +42,10 @@ const SOCIAL_ICONS = {
 function OfficerCard({ officer, index }) {
   const tone = AVATAR_TONES[index % AVATAR_TONES.length];
   const badgeStyle = BADGE_STYLES[officer.badge] ?? BADGE_STYLES.Operations;
+  // Show the officer's photo when provided; fall back to initials if it's
+  // missing or fails to load, so the card never shows a broken image.
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const showPhoto = officer.photo && !photoFailed;
 
   return (
     <article className="card-hover group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -52,12 +56,22 @@ function OfficerCard({ officer, index }) {
         {officer.badge}
       </span>
 
-      {/* Avatar */}
-      <div
-        className={`grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br ${tone} text-2xl font-black text-white shadow-glass ring-4 ring-white`}
-      >
-        {initials(officer.name)}
-      </div>
+      {/* Avatar — photo if available, otherwise initials */}
+      {showPhoto ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={officer.photo}
+          alt={officer.name}
+          onError={() => setPhotoFailed(true)}
+          className="h-20 w-20 rounded-2xl object-cover shadow-glass ring-4 ring-white"
+        />
+      ) : (
+        <div
+          className={`grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br ${tone} text-2xl font-black text-white shadow-glass ring-4 ring-white`}
+        >
+          {initials(officer.name)}
+        </div>
+      )}
 
       <h4 className="mt-5 text-lg font-bold text-ink">{officer.name}</h4>
       <p className="mt-1 text-sm font-semibold text-feu-teal">

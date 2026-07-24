@@ -1,0 +1,2 @@
+# Put officer photo files in this folder (e.g. yensid-mimay.jpg).
+# Reference them from data/leadership.js as: photo: "/officers/yensid-mimay.jpg"
