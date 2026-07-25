@@ -26,7 +26,7 @@ export const batches = [
     active: true,
     tagline: "The current active term — leading FEU Alabang forward.",
     officers: makeOfficers([
-      { name: "Yensid Ritchy Mimay", position: "President", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
+      { name: "Yensid Ritchy Mimay", position: "President", badge: "Executive", photo: "/officers/Yensid.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Vonn Kendrick C. Pedrena", position: "Vice President — Internal", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
       { name: "Mariel S. Riquero", position: "Vice President — External", badge: "Executive", photo: "/officers/Mariel.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Justin Janda", position: "Secretary", badge: "Secretariat", photo: "/officers/Justin.jpg", socials: { facebook: "#", instagram: "#" } },
@@ -44,7 +44,7 @@ export const batches = [
     tagline: "Sustaining the momentum of student-led excellence.",
     officers: makeOfficers([
       { name: "Nathanael V. Ragasa", position: "President", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
-      { name: "Yensid Ritchy Mimay", position: "Vice President — Internal", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
+      { name: "Yensid Ritchy Mimay", position: "Vice President — Internal", badge: "Executive", photo: "/officers/Yensid.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Vonn Kendrick C. Pedrena", position: "Vice President — External", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
       { name: "Gabriel Montales", position: "Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
       { name: "TBA", position: "Assistant Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
