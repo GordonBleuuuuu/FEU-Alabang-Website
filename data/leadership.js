@@ -43,7 +43,7 @@ export const batches = [
     active: false,
     tagline: "Sustaining the momentum of student-led excellence.",
     officers: makeOfficers([
-      { name: "Nathanael V. Ragasa", position: "President", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
+      { name: "Nathanael V. Ragasa", position: "President", badge: "Executive", photo: "/officers/Nigel.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Yensid Ritchy Mimay", position: "Vice President — Internal", badge: "Executive", photo: "/officers/Yensid.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Vonn Kendrick C. Pedrena", position: "Vice President — External", badge: "Executive", photo: "/officers/Kendrick.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Gabriel Montales", position: "Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
