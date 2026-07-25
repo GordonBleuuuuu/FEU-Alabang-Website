@@ -27,7 +27,7 @@ export const batches = [
     tagline: "The current active term — leading FEU Alabang forward.",
     officers: makeOfficers([
       { name: "Yensid Ritchy Mimay", position: "President", badge: "Executive", photo: "/officers/Yensid.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Vonn Kendrick C. Pedrena", position: "Vice President — Internal", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
+      { name: "Vonn Kendrick C. Pedrena", position: "Vice President — Internal", badge: "Executive", photo: "/officers/Kendrick.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Mariel S. Riquero", position: "Vice President — External", badge: "Executive", photo: "/officers/Mariel.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Justin Janda", position: "Secretary", badge: "Secretariat", photo: "/officers/Justin.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "TBA", position: "Assistant Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
@@ -45,7 +45,7 @@ export const batches = [
     officers: makeOfficers([
       { name: "Nathanael V. Ragasa", position: "President", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
       { name: "Yensid Ritchy Mimay", position: "Vice President — Internal", badge: "Executive", photo: "/officers/Yensid.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Vonn Kendrick C. Pedrena", position: "Vice President — External", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
+      { name: "Vonn Kendrick C. Pedrena", position: "Vice President — External", badge: "Executive", photo: "/officers/Kendrick.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Gabriel Montales", position: "Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
       { name: "TBA", position: "Assistant Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
       { name: "Thalia M. Colico", position: "Treasurer", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
@@ -64,7 +64,7 @@ export const batches = [
       { name: "Trisha Grace Edang", position: "Vice President", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
       { name: "Martin Matthew Ambayec", position: "Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
       { name: "Zeon Bretaña", position: "Treasurer", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
-      { name: "Vonn Kendrick C. Pedrena", position: "Public Relations Officer", badge: "Communications", socials: { facebook: "#", instagram: "#" } },
+      { name: "Vonn Kendrick C. Pedrena", position: "Public Relations Officer", badge: "Communications", photo: "/officers/Kendrick.jpg", socials: { facebook: "#", instagram: "#" } },
     ]),
   },
   {
