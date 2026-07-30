@@ -1,38 +1,67 @@
 "use client";
 
 import { useState } from "react";
-import { Send, Mail } from "lucide-react";
+import { Send, CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 
-// The contact form opens the visitor's email app with a message pre-addressed
-// to the SCC. No backend, no third-party service, no keys required.
+// -----------------------------------------------------------------------------
+// Forminit form backend — submissions are emailed to ascc@feualabang.edu.ph
+// (configured in the Forminit dashboard: Email Notifications).
+//
+// Public client-side mode: posts straight from the browser, no API key needed.
+// Field names use Forminit's "block" convention (fi-sender-*, fi-text-*).
+// -----------------------------------------------------------------------------
+const FORMINIT_ENDPOINT =
+  process.env.NEXT_PUBLIC_FORMINIT_ENDPOINT ||
+  "https://forminit.com/f/ngl6g12r2nj";
+
 const CONTACT_EMAIL = "ascc@feualabang.edu.ph";
 
 export default function ContactForm() {
-  const [opened, setOpened] = useState(false);
+  const [status, setStatus] = useState("idle"); // idle | submitting | success | error
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const name = (fd.get("name") || "").toString().trim();
-    const email = (fd.get("email") || "").toString().trim();
-    const message = (fd.get("message") || "").toString().trim();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
 
-    const subject = `Website inquiry from ${name || "a student"}`;
-    const body =
-      `Name: ${name}\n` +
-      `Email: ${email}\n\n` +
-      `${message}\n`;
+    // Honeypot: bots fill the hidden "_hp" field; real users never do.
+    if (formData.get("_hp")) {
+      setStatus("success");
+      form.reset();
+      return;
+    }
+    formData.delete("_hp"); // don't forward the honeypot to Forminit
 
-    // Open the visitor's default email client with everything pre-filled.
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-      subject
-    )}&body=${encodeURIComponent(body)}`;
+    setStatus("submitting");
+    setError("");
 
-    setOpened(true);
+    try {
+      const res = await fetch(FORMINIT_ENDPOINT, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: formData,
+      });
+      if (res.ok) {
+        setStatus("success");
+        form.reset();
+        setTimeout(() => setStatus("idle"), 6000);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setStatus("error");
+        setError(
+          data.message || "Something went wrong. Please try again in a moment."
+        );
+      }
+    } catch {
+      setStatus("error");
+      setError("Network error — please try again, or email us directly.");
+    }
   };
 
   const inputClass =
-    "w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/30";
+    "w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/30 disabled:opacity-60";
+  const submitting = status === "submitting";
 
   return (
     <form
@@ -46,9 +75,10 @@ export default function ContactForm() {
           </label>
           <input
             id="cf-name"
-            name="name"
+            name="fi-sender-fullName"
             type="text"
             required
+            disabled={submitting}
             placeholder="Juan Dela Cruz"
             className={inputClass}
           />
@@ -59,9 +89,10 @@ export default function ContactForm() {
           </label>
           <input
             id="cf-email"
-            name="email"
+            name="fi-sender-email"
             type="email"
             required
+            disabled={submitting}
             placeholder="you@feualabang.edu.ph"
             className={inputClass}
           />
@@ -72,37 +103,71 @@ export default function ContactForm() {
           </label>
           <textarea
             id="cf-message"
-            name="message"
+            name="fi-text-message"
             rows={4}
             required
+            disabled={submitting}
             placeholder="How can the SCC help you?"
             className={`${inputClass} resize-none`}
           />
         </div>
 
-        <button type="submit" className="btn-gold w-full">
-          Send Message
-          <Send className="h-4 w-4" />
+        {/* Honeypot anti-spam field — visually hidden, ignored by humans */}
+        <input
+          type="text"
+          name="_hp"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="hidden"
+          style={{ display: "none" }}
+        />
+
+        <button
+          type="submit"
+          disabled={submitting}
+          className="btn-gold w-full disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {submitting ? (
+            <>
+              Sending…
+              <Loader2 className="h-4 w-4 animate-spin" />
+            </>
+          ) : status === "success" ? (
+            <>
+              Message sent!
+              <CheckCircle2 className="h-4 w-4" />
+            </>
+          ) : (
+            <>
+              Send Message
+              <Send className="h-4 w-4" />
+            </>
+          )}
         </button>
 
-        {opened && (
-          <p className="text-center text-xs text-white/60">
-            Your email app should have opened with a message ready to send. If it
-            didn&apos;t,{" "}
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="font-semibold text-gold underline"
-            >
-              email us directly
-            </a>
-            .
+        {status === "success" && (
+          <p className="flex items-center justify-center gap-1.5 text-center text-xs font-medium text-emerald-300">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            Thanks! Your message was sent to the SCC. We&apos;ll get back to you soon.
           </p>
         )}
 
-        <p className="flex items-center justify-center gap-1.5 text-center text-xs text-white/50">
-          <Mail className="h-3.5 w-3.5" />
-          Messages go to {CONTACT_EMAIL}
-        </p>
+        {status === "error" && (
+          <p className="flex flex-wrap items-center justify-center gap-1.5 text-center text-xs font-medium text-red-300">
+            <AlertCircle className="h-3.5 w-3.5" />
+            {error}{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="underline hover:text-gold">
+              Email us directly
+            </a>
+          </p>
+        )}
+
+        {(status === "idle" || status === "submitting") && (
+          <p className="text-center text-xs text-white/50">
+            Your message goes straight to {CONTACT_EMAIL}.
+          </p>
+        )}
       </div>
     </form>
   );
