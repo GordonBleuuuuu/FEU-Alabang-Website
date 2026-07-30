@@ -1,5 +1,4 @@
 import {
-  FileText,
   CalendarClock,
   HelpCircle,
   BookOpenCheck,
@@ -8,26 +7,12 @@ import {
   ArrowRight,
   Facebook,
   Instagram,
-  FolderOpen,
-  Download,
-  ExternalLink,
 } from "lucide-react";
 import ContactForm from "./ContactForm";
+import RsoForms from "./RsoForms";
 
-// Google Drive folder holding all RSO (Recognized Student Organization) forms.
-const DRIVE_FORMS_URL =
-  "https://drive.google.com/drive/folders/1cf-mOLMfRiGyJ3bvglDnQJojEukZUGrY";
-
+// The Forms & Requests card is rendered by <RsoForms /> (it opens a modal).
 const RESOURCES = [
-  {
-    icon: FileText,
-    title: "Forms & Requests",
-    description:
-      "RSO forms and official SCC requests — accreditation, activity proposals, reports, and more.",
-    action: "Open forms drive",
-    href: DRIVE_FORMS_URL,
-    external: true,
-  },
   {
     icon: CalendarClock,
     title: "Event Calendar",
@@ -54,24 +39,6 @@ const RESOURCES = [
   },
 ];
 
-// RSO document categories available in the Drive folder above.
-const RSO_FORMS = [
-  "Accreditation",
-  "Activity Proposals",
-  "Candidacy Forms",
-  "Officership (Appointment)",
-  "Monthly Report",
-  "Term End Report",
-  "End of Year Report",
-  "Liquidation",
-  "Leadership Award",
-  "Annual Students' Recognition",
-  "Endorsement Letter",
-  "Official Attendance Sheet",
-  "Org / Club Code (Correspondence & Minutes)",
-  "Other Forms",
-];
-
 export default function Resources() {
   return (
     <section id="resources" className="relative overflow-hidden bg-feu-moss py-24 text-white">
@@ -96,6 +63,9 @@ export default function Resources() {
 
         {/* Resource cards */}
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Forms & Requests — opens the RSO forms modal */}
+          <RsoForms />
+
           {RESOURCES.map((r) => (
             <a
               key={r.title}
@@ -117,53 +87,6 @@ export default function Resources() {
               </span>
             </a>
           ))}
-        </div>
-
-        {/* RSO Forms & Documents */}
-        <div className="mt-12 rounded-3xl border border-white/10 bg-white/[0.05] p-8 backdrop-blur-xl lg:p-10">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <span className="pill bg-gold/15 text-gold ring-1 ring-gold/25">
-                <FolderOpen className="h-3.5 w-3.5" />
-                For Recognized Student Organizations
-              </span>
-              <h3 className="mt-3 text-2xl font-black">
-                RSO Forms &amp; Documents
-              </h3>
-              <p className="mt-2 max-w-xl text-sm text-white/70">
-                Every official form your organization needs — accreditation,
-                activity proposals, reports, liquidation, and more. Click a
-                category to open and download it from the SCC forms drive.
-              </p>
-            </div>
-            <a
-              href={DRIVE_FORMS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-gold shrink-0"
-            >
-              <Download className="h-4 w-4" />
-              Open Forms Drive
-            </a>
-          </div>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {RSO_FORMS.map((form) => (
-              <a
-                key={form}
-                href={DRIVE_FORMS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium transition hover:border-gold/40 hover:bg-white/10"
-              >
-                <span className="flex items-center gap-2.5">
-                  <FileText className="h-4 w-4 shrink-0 text-gold" />
-                  {form}
-                </span>
-                <ExternalLink className="h-3.5 w-3.5 shrink-0 text-white/40 transition group-hover:text-gold" />
-              </a>
-            ))}
-          </div>
         </div>
 
         {/* Contact panel */}
