@@ -90,8 +90,11 @@ export default function RsoForms() {
 
           {/* Dialog */}
           <div className="relative z-10 max-h-[85vh] w-full max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-white text-ink shadow-2xl animate-fade-up">
-            {/* Header */}
-            <div className="flex items-start justify-between gap-4 border-b border-slate-100 bg-gradient-to-br from-feu-green to-feu-teal p-6 text-white">
+            {/* Header — inline gradient so it always renders (never cache-stale) */}
+            <div
+              className="flex items-start justify-between gap-4 border-b border-slate-100 p-6 text-white"
+              style={{ background: "linear-gradient(135deg, #004B23, #0F5257)" }}
+            >
               <div>
                 <span className="pill bg-white/15 text-gold ring-1 ring-white/20">
                   <Folder className="h-3.5 w-3.5" />

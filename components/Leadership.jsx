@@ -180,8 +180,11 @@ function OfficerProfileModal({ officer, batch, onClose }) {
       />
 
       <div className="relative z-10 max-h-[88vh] w-full max-w-lg overflow-hidden rounded-3xl border border-slate-200 bg-white text-ink shadow-2xl animate-fade-up">
-        {/* Header */}
-        <div className="relative bg-gradient-to-br from-feu-green to-feu-teal p-6 text-white">
+        {/* Header — inline gradient so it always renders (never cache-stale) */}
+        <div
+          className="relative p-6 text-white"
+          style={{ background: "linear-gradient(135deg, #004B23, #0F5257)" }}
+        >
           <button
             type="button"
             onClick={onClose}
