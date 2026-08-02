@@ -1,7 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Facebook, Instagram, Linkedin, Mail, Star, ShieldCheck } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Mail,
+  Star,
+  ShieldCheck,
+  ArrowRight,
+  X,
+  Quote,
+  Lightbulb,
+  Award,
+  CheckCircle2,
+  Sparkles,
+} from "lucide-react";
 import { batches } from "@/data/leadership";
 
 // Badge → color styling map.
@@ -39,7 +53,31 @@ const SOCIAL_ICONS = {
   email: Mail,
 };
 
-function OfficerCard({ officer, index }) {
+function SocialLinks({ officer, variant = "card" }) {
+  const base =
+    variant === "card"
+      ? "bg-slate-100 text-slate-500 hover:bg-feu-green hover:text-white"
+      : "bg-white text-slate-500 ring-1 ring-slate-200 hover:bg-feu-green hover:text-white";
+  return Object.entries(officer.socials || {}).map(([key, href]) => {
+    const Icon = SOCIAL_ICONS[key];
+    if (!Icon) return null;
+    return (
+      <a
+        key={key}
+        href={href}
+        target={href?.startsWith("http") ? "_blank" : undefined}
+        rel="noreferrer"
+        onClick={(e) => e.stopPropagation()}
+        aria-label={`${officer.name} on ${key}`}
+        className={`grid h-9 w-9 place-items-center rounded-xl transition ${base}`}
+      >
+        <Icon className="h-4 w-4" />
+      </a>
+    );
+  });
+}
+
+function OfficerCard({ officer, index, onSelect }) {
   const tone = AVATAR_TONES[index % AVATAR_TONES.length];
   const badgeStyle = BADGE_STYLES[officer.badge] ?? BADGE_STYLES.Operations;
   // Show the officer's photo when provided; fall back to initials if it's
@@ -48,11 +86,20 @@ function OfficerCard({ officer, index }) {
   const showPhoto = officer.photo && !photoFailed;
 
   return (
-    <article className="card-hover group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <article
+      role="button"
+      tabIndex={0}
+      onClick={() => onSelect(officer)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect(officer);
+        }
+      }}
+      className="card-hover group relative cursor-pointer overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-feu-green focus-visible:ring-offset-2"
+    >
       {/* Badge */}
-      <span
-        className={`pill absolute right-4 top-4 ring-1 ${badgeStyle}`}
-      >
+      <span className={`pill absolute right-4 top-4 ring-1 ${badgeStyle}`}>
         {officer.badge}
       </span>
 
@@ -81,24 +128,15 @@ function OfficerCard({ officer, index }) {
         <p className="mt-0.5 text-xs text-slate-500">{officer.department}</p>
       ) : null}
 
-      {/* Socials */}
-      <div className="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4">
-        {Object.entries(officer.socials || {}).map(([key, href]) => {
-          const Icon = SOCIAL_ICONS[key];
-          if (!Icon) return null;
-          return (
-            <a
-              key={key}
-              href={href}
-              target={href?.startsWith("http") ? "_blank" : undefined}
-              rel="noreferrer"
-              aria-label={`${officer.name} on ${key}`}
-              className="grid h-9 w-9 place-items-center rounded-xl bg-slate-100 text-slate-500 transition hover:bg-feu-green hover:text-white"
-            >
-              <Icon className="h-4 w-4" />
-            </a>
-          );
-        })}
+      {/* Socials + view-profile hint */}
+      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+        <div className="flex items-center gap-2">
+          <SocialLinks officer={officer} variant="card" />
+        </div>
+        <span className="inline-flex items-center gap-1 text-xs font-semibold text-feu-green/70 transition group-hover:text-feu-green">
+          View profile
+          <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+        </span>
       </div>
 
       <div className="pointer-events-none absolute -bottom-8 -right-8 h-24 w-24 rounded-full bg-gold/10 blur-2xl transition group-hover:bg-gold/20" />
@@ -106,10 +144,167 @@ function OfficerCard({ officer, index }) {
   );
 }
 
+function OfficerProfileModal({ officer, batch, onClose }) {
+  const [photoFailed, setPhotoFailed] = useState(false);
+
+  // Escape to close + lock background scroll while open.
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  const showPhoto = officer.photo && !photoFailed;
+  const hasBio = Boolean(officer.bio);
+  const hasContribs = (officer.contributions || []).length > 0;
+  const hasAchievements = (officer.achievements || []).length > 0;
+  const hasSocials =
+    officer.socials && Object.keys(officer.socials).length > 0;
+  const isEmpty = !hasBio && !hasContribs && !hasAchievements;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="officer-profile-name"
+    >
+      <div
+        className="absolute inset-0 bg-ink/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      <div className="relative z-10 max-h-[88vh] w-full max-w-lg overflow-hidden rounded-3xl border border-slate-200 bg-white text-ink shadow-2xl animate-fade-up">
+        {/* Header */}
+        <div className="relative bg-gradient-to-br from-feu-green to-feu-teal p-6 text-white">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-white transition hover:bg-white/20"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <div className="flex items-center gap-4 pr-10">
+            {showPhoto ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={officer.photo}
+                alt={officer.name}
+                onError={() => setPhotoFailed(true)}
+                className="h-24 w-24 shrink-0 rounded-2xl object-cover ring-4 ring-white/30"
+              />
+            ) : (
+              <div className="grid h-24 w-24 shrink-0 place-items-center rounded-2xl bg-white/15 text-3xl font-black ring-4 ring-white/30">
+                {initials(officer.name)}
+              </div>
+            )}
+            <div>
+              <span className="pill bg-white/15 text-gold ring-1 ring-white/20">
+                {officer.badge}
+              </span>
+              <h3
+                id="officer-profile-name"
+                className="mt-2 text-xl font-black leading-tight"
+              >
+                {officer.name}
+              </h3>
+              <p className="text-sm font-semibold text-gold">
+                {officer.position}
+              </p>
+              <p className="text-xs text-white/70">
+                {batch.label} · {batch.sy}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="max-h-[50vh] overflow-y-auto p-6">
+          {officer.department ? (
+            <p className="text-sm text-slate-500">
+              <span className="font-semibold text-ink">Program:</span>{" "}
+              {officer.department}
+            </p>
+          ) : null}
+
+          {hasBio && (
+            <section className="mt-4">
+              <h4 className="flex items-center gap-2 text-sm font-bold text-feu-green">
+                <Quote className="h-4 w-4" /> About
+              </h4>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                {officer.bio}
+              </p>
+            </section>
+          )}
+
+          {hasContribs && (
+            <section className="mt-5">
+              <h4 className="flex items-center gap-2 text-sm font-bold text-feu-green">
+                <Lightbulb className="h-4 w-4" /> Contributions
+              </h4>
+              <ul className="mt-2 space-y-2">
+                {officer.contributions.map((c, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-slate-600">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-feu-teal" />
+                    <span>{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {hasAchievements && (
+            <section className="mt-5">
+              <h4 className="flex items-center gap-2 text-sm font-bold text-feu-green">
+                <Award className="h-4 w-4" /> Achievements &amp; Awards
+              </h4>
+              <ul className="mt-2 space-y-2">
+                {officer.achievements.map((a, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-slate-600">
+                    <Star className="mt-0.5 h-4 w-4 shrink-0 text-gold-deep" />
+                    <span>{a}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {isEmpty && (
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-cloud p-6 text-center">
+              <Sparkles className="mx-auto h-6 w-6 text-gold-deep" />
+              <p className="mt-2 text-sm text-slate-500">
+                More about {officer.name.split(" ")[0]} coming soon.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer socials */}
+        {hasSocials && (
+          <div className="flex items-center gap-2 border-t border-slate-100 bg-cloud px-6 py-4">
+            <span className="text-xs font-semibold text-slate-500">
+              Connect:
+            </span>
+            <SocialLinks officer={officer} variant="modal" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Leadership() {
   const [activeId, setActiveId] = useState(
     batches.find((b) => b.active)?.id ?? batches[0].id
   );
+  const [selected, setSelected] = useState(null); // { officer, batch }
 
   const activeBatch = useMemo(
     () => batches.find((b) => b.id === activeId) ?? batches[0],
@@ -132,7 +327,8 @@ export default function Leadership() {
           </h2>
           <p className="mt-4 text-lg text-slate-600">
             Six batches of elected student leaders, each carrying the torch of
-            service forward. Switch between cohorts to explore every term.
+            service forward. Switch between cohorts, then tap any officer to see
+            their profile.
           </p>
         </div>
 
@@ -215,10 +411,20 @@ export default function Leadership() {
               key={`${activeBatch.id}-${officer.position}-${i}`}
               officer={officer}
               index={i}
+              onSelect={(o) => setSelected({ officer: o, batch: activeBatch })}
             />
           ))}
         </div>
       </div>
+
+      {/* Officer profile modal */}
+      {selected && (
+        <OfficerProfileModal
+          officer={selected.officer}
+          batch={selected.batch}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </section>
   );
 }

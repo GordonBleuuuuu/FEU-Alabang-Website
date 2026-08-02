@@ -6,7 +6,17 @@
 //  roster for each batch. The structure is intentionally simple to edit.
 //
 //  Each officer:
-//    { name, position, department, badge, socials: { facebook, instagram, linkedin, email } }
+//    {
+//      name, position, department, badge,
+//      photo: "/officers/Name.jpg",
+//      socials: { facebook, instagram, linkedin, email },
+//      bio: "Short paragraph about the officer.",
+//      contributions: ["Led X initiative", "Organized Y event"],
+//      achievements: ["Outstanding Leader 2024", "Dean's Lister"],
+//    }
+//  Clicking an officer card opens a profile modal. `bio`, `contributions`, and
+//  `achievements` are optional — leave them empty until the survey responses
+//  come in, and the modal hides empty sections automatically.
 //  `badge` groups officers into color-coded categories (see BADGE_STYLES in the
 //  Leadership component).
 // =============================================================================
@@ -15,6 +25,9 @@ const makeOfficers = (roster) =>
   roster.map((o) => ({
     department: "",
     socials: {},
+    bio: "",
+    contributions: [],
+    achievements: [],
     ...o,
   }));
 
@@ -33,7 +46,7 @@ export const batches = [
       { name: "TBA", position: "Assistant Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
       { name: "Allan Matthew C. Callao", position: "Treasurer", badge: "Finance", photo: "/officers/Matthew.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Nathalie H. Colico", position: "Auditor", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
-      { name: "Nathanael Geraldine V. Ragasa", position: "Public Relations Officer", badge: "Communications", photo: "/officers/Nigel.jpg", socials: { facebook: "#", instagram: "#" } },
+      { name: "Nathanael Gerard V. Ragasa", position: "Public Relations Officer", badge: "Communications", photo: "/officers/Nigel.jpg", socials: { facebook: "#", instagram: "#" } },
     ]),
   },
   {
