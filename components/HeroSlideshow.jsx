@@ -9,6 +9,13 @@ const SLIDES = [
   "/hero/scc-1.jpg",
   "/hero/scc-2.jpg",
   "/hero/scc-3.jpg",
+  "/hero/scc-4.jpg",
+  "/hero/scc-5.jpg",
+  "/hero/scc-6.jpg",
+  "/hero/scc-7.jpg",
+  "/hero/scc-8.jpg",
+  "/hero/scc-9.jpg",
+  "/hero/scc-10.jpg",
 ];
 
 export default function HeroSlideshow() {
