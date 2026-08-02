@@ -6,6 +6,7 @@ import {
   Rocket,
 } from "lucide-react";
 import Logo from "./Logo";
+import HeroSlideshow from "./HeroSlideshow";
 
 const STATS = [
   { value: "2021", label: "Established" },
@@ -20,9 +21,22 @@ export default function Hero() {
       className="relative overflow-hidden bg-feu-moss text-white"
     >
       {/* Background layers */}
-      <div className="absolute inset-0 bg-gradient-to-br from-feu-moss via-feu-green to-feu-teal" />
-      <div className="absolute inset-0 bg-grid-fade [background-size:44px_44px] opacity-40" />
+      <div className="absolute inset-0 bg-feu-moss" />
+      {/* Photo slideshow (silhouette behind the headline) */}
+      <HeroSlideshow />
+      {/* Green wash — makes the photos read as a silhouette + keeps text legible.
+          Inline gradient so it always renders (never cache-stale). */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(115deg, rgba(10,61,31,0.94) 0%, rgba(0,75,35,0.88) 45%, rgba(15,82,87,0.82) 100%)",
+        }}
+      />
+      <div className="absolute inset-0 bg-grid-fade [background-size:44px_44px] opacity-30" />
       <div className="absolute inset-0 bg-radial-gold" />
+      {/* Fade into the section below */}
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-feu-moss to-transparent" />
       <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-gold/20 blur-3xl" />
       <div className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-feu-teal/40 blur-3xl" />
 

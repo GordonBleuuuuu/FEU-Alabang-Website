@@ -1,0 +1,5 @@
+# Hero background slideshow photos.
+# Save images here named: scc-1.jpg, scc-2.jpg, scc-3.jpg
+# They appear as a green-tinted silhouette slideshow behind the hero headline.
+# Add/remove entries in components/HeroSlideshow.jsx to match how many you have.
+# Wide/landscape photos (e.g. 1920x1080) look best.
