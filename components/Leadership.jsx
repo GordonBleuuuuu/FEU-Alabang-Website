@@ -27,25 +27,6 @@ const BADGE_STYLES = {
   Operations: "bg-slate-500/10 text-slate-700 ring-slate-500/20",
 };
 
-// Deterministic avatar tone from a name so placeholders look varied.
-const AVATAR_TONES = [
-  "from-feu-green to-feu-teal",
-  "from-gold to-gold-deep",
-  "from-feu-teal to-feu-moss",
-  "from-emerald-600 to-feu-green",
-  "from-gold-deep to-feu-green",
-];
-
-function initials(name) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase();
-}
-
 const SOCIAL_ICONS = {
   facebook: Facebook,
   instagram: Instagram,
@@ -77,13 +58,15 @@ function SocialLinks({ officer, variant = "card" }) {
   });
 }
 
+// Fallback shown when an officer has no photo (or their photo fails to load).
+const FALLBACK_PHOTO = "/scc-black.png";
+
 function OfficerCard({ officer, index, onSelect }) {
-  const tone = AVATAR_TONES[index % AVATAR_TONES.length];
   const badgeStyle = BADGE_STYLES[officer.badge] ?? BADGE_STYLES.Operations;
-  // Show the officer's photo when provided; fall back to initials if it's
-  // missing or fails to load, so the card never shows a broken image.
+  // Show the officer's photo when provided; fall back to the SCC crest so the
+  // card never shows a broken image or a raw initials placeholder.
   const [photoFailed, setPhotoFailed] = useState(false);
-  const showPhoto = officer.photo && !photoFailed;
+  const photoSrc = photoFailed || !officer.photo ? FALLBACK_PHOTO : officer.photo;
 
   return (
     <article
@@ -103,22 +86,16 @@ function OfficerCard({ officer, index, onSelect }) {
         {officer.badge}
       </span>
 
-      {/* Avatar — photo if available, otherwise initials */}
-      {showPhoto ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={officer.photo}
-          alt={officer.name}
-          onError={() => setPhotoFailed(true)}
-          className="h-20 w-20 rounded-2xl object-cover shadow-glass ring-4 ring-white"
-        />
-      ) : (
-        <div
-          className={`grid h-20 w-20 place-items-center rounded-2xl bg-gradient-to-br ${tone} text-2xl font-black text-white shadow-glass ring-4 ring-white`}
-        >
-          {initials(officer.name)}
-        </div>
-      )}
+      {/* Avatar — real photo when set, otherwise SCC crest fallback */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={photoSrc}
+        alt={officer.name}
+        onError={() => setPhotoFailed(true)}
+        className={`h-20 w-20 rounded-2xl object-cover shadow-glass ring-4 ring-white ${
+          photoSrc === FALLBACK_PHOTO ? "bg-feu-moss p-2" : ""
+        }`}
+      />
 
       <h4 className="mt-5 text-lg font-bold text-ink">{officer.name}</h4>
       <p className="mt-1 text-sm font-semibold text-feu-teal">
@@ -159,7 +136,8 @@ function OfficerProfileModal({ officer, batch, onClose }) {
     };
   }, [onClose]);
 
-  const showPhoto = officer.photo && !photoFailed;
+  const photoSrc = photoFailed || !officer.photo ? FALLBACK_PHOTO : officer.photo;
+  const usingFallbackPhoto = photoSrc === FALLBACK_PHOTO;
   const hasBio = Boolean(officer.bio);
   const hasContribs = (officer.contributions || []).length > 0;
   const hasAchievements = (officer.achievements || []).length > 0;
@@ -194,19 +172,15 @@ function OfficerProfileModal({ officer, batch, onClose }) {
             <X className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-4 pr-10">
-            {showPhoto ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={officer.photo}
-                alt={officer.name}
-                onError={() => setPhotoFailed(true)}
-                className="h-24 w-24 shrink-0 rounded-2xl object-cover ring-4 ring-white/30"
-              />
-            ) : (
-              <div className="grid h-24 w-24 shrink-0 place-items-center rounded-2xl bg-white/15 text-3xl font-black ring-4 ring-white/30">
-                {initials(officer.name)}
-              </div>
-            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photoSrc}
+              alt={officer.name}
+              onError={() => setPhotoFailed(true)}
+              className={`h-24 w-24 shrink-0 rounded-2xl object-cover ring-4 ring-white/30 ${
+                usingFallbackPhoto ? "bg-feu-moss p-2" : ""
+              }`}
+            />
             <div>
               <span className="pill bg-white/15 text-gold ring-1 ring-white/20">
                 {officer.badge}
