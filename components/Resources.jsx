@@ -27,7 +27,8 @@ const RESOURCES = [
     description:
       "Reference university policies, guidelines, and student rights & responsibilities.",
     action: "Open handbook",
-    href: "#resources",
+    href: "https://drive.google.com/file/d/1TPZ1d-kJPaSAuvo4DrOLezMGtL122dZI/view",
+    external: true,
   },
   {
     icon: HelpCircle,
