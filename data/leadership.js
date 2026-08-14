@@ -63,7 +63,7 @@ export const batches = [
       { name: "TBA", position: "Assistant Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
       { name: "Nathalie H. Colico", position: "Treasurer", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
       { name: "TBA", position: "Auditor", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
-      { name: "Chis V. Adea", position: "Public Relations Officer", badge: "Communications", socials: { facebook: "#", instagram: "#" } },
+      { name: "Chis V. Adea", position: "Public Relations Officer", badge: "Communications", photo: "/officers/Chis.jpg", socials: { facebook: "#", instagram: "#" } },
     ]),
   },
   {
