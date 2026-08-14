@@ -79,10 +79,7 @@ export default function About() {
           </div>
 
           <div className="mx-auto mt-10 max-w-4xl">
-            <div className="relative grid gap-6 sm:grid-cols-2">
-              {/* Vertical connector line on desktop */}
-              <div className="pointer-events-none absolute left-1/2 top-6 hidden h-[calc(100%-3rem)] w-px -translate-x-1/2 bg-gradient-to-b from-gold via-feu-green to-feu-teal sm:block" />
-
+            <div className="grid gap-6 sm:grid-cols-2 sm:items-stretch">
               {/* 2021 — Founding */}
               <article className="card-hover relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
                 <div className="mb-4 flex items-center gap-3">
@@ -114,7 +111,7 @@ export default function About() {
               </article>
 
               {/* 2022 — Return to campus */}
-              <article className="card-hover relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:mt-16">
+              <article className="card-hover relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
                 <div className="mb-4 flex items-center gap-3">
                   <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gold text-feu-moss shadow-gold">
                     <Milestone className="h-5 w-5" />
