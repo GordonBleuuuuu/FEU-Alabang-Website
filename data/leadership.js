@@ -49,7 +49,7 @@ export const batches = [
         position: "Secretary",
         badge: "Secretariat",
         photo: "/officers/Justin.jpg",
-        department: "BS Computer Science with Specialization in Software Engineering — 3rd Year",
+        department: "BS Computer Science with Specialization in Software Engineering",
         socials: { facebook: "#", instagram: "#" },
         bio: "I envision myself as a dedicated and organized leader, a leader who emphasizes the importance of accountability, communication, and teamwork. I aim to help create an organization that fosters a safe space where students can freely be themselves while remaining coordinated, transparent, and connected.",
         experience: [
