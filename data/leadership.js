@@ -43,7 +43,7 @@ export const batches = [
       { name: "Vonn Kendrick C. Pedrena", position: "Vice President — Internal", badge: "Executive", photo: "/officers/Kendrick.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Mariel Daniella P. Riquero", position: "Vice President — External", badge: "Executive", photo: "/officers/Mariel.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Justin Emmanuel J. Janda", position: "Secretary", badge: "Secretariat", photo: "/officers/Justin.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "TBA", position: "Assistant Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
+      { name: "Gabriel Montales", position: "Assistant Secretary", badge: "Secretariat", photo: "/officers/Gab.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Allan Matthew C. Callao", position: "Treasurer", badge: "Finance", photo: "/officers/Matthew.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Nathalie H. Colico", position: "Auditor", badge: "Finance", photo: "/officers/Thalia.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Nathanael Gerard V. Ragasa", position: "Public Relations Officer", badge: "Communications", photo: "/officers/Nigel.jpg", socials: { facebook: "#", instagram: "#" } },
