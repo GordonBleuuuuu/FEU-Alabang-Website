@@ -103,7 +103,7 @@ export const batches = [
     tagline: "Growing the council's reach and traditions.",
     officers: makeOfficers([
       { name: "Alejandro Marcus Cu", position: "President", badge: "Executive", photo: "/officers/Ali.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Abigail Darlene Mitra", position: "Vice President — Internal Affairs", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
+      { name: "Abigail Darlene Mitra", position: "Vice President — Internal Affairs", badge: "Executive", photo: "/officers/Abigail.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Kenshin Ives Torrente", position: "Vice President — External Affairs", badge: "Executive", photo: "/officers/Kenshin.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Aster Joy Peralta", position: "Executive Secretary", badge: "Secretariat", photo: "/officers/Aster.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Marijo Cayo", position: "Assistant Secretary", badge: "Secretariat", photo: "/officers/Marijo.jpg", socials: { facebook: "#", instagram: "#" } },
@@ -124,7 +124,7 @@ export const batches = [
       { name: "Edward Ryan Ong", position: "Vice President — External Affairs", badge: "Executive", photo: "/officers/Edward.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Beatrice Nicole Icban", position: "Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
       { name: "Aaron Daniel Mitra", position: "Treasurer", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
-      { name: "Abigail Darlene Mitra", position: "Auditor", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
+      { name: "Abigail Darlene Mitra", position: "Auditor", badge: "Finance", photo: "/officers/Abigail.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Kenshin Ives Torrente", position: "Public Relations Officer", badge: "Communications", photo: "/officers/Kenshin.jpg", socials: { facebook: "#", instagram: "#" } },
     ]),
   },
