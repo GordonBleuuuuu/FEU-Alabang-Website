@@ -6,7 +6,7 @@ const GALLERY = [
   { title: "General Assembly", span: "sm:col-span-2 sm:row-span-2", tone: "from-feu-green to-feu-teal" },
   { title: "Community Outreach", span: "", tone: "from-gold to-gold-deep" },
   { title: "Year End Leadership Training Seminar", span: "", tone: "from-feu-teal to-feu-moss" },
-  { title: "ATam Esports Expo", span: "sm:col-span-2", tone: "from-feu-moss to-feu-green", src: "/gallery/atam-esports-expo.jpg" },
+  { title: "ATam Esports Expo", span: "sm:col-span-2", tone: "from-feu-moss to-feu-green", src: "/gallery/atam-esports-expo.jpg", focus: "top" },
   { title: "ATamforJuan", span: "", tone: "from-gold-deep to-feu-green", src: "/gallery/atamforjuan.jpg" },
   { title: "Annual Student Recognition", span: "", tone: "from-feu-green to-gold-deep", src: "/gallery/annual-student-recognition.jpg" },
   { title: "ATamOneJam", span: "sm:col-span-2", tone: "from-feu-teal to-gold-deep", src: "/gallery/atamonejam.jpg" },
@@ -186,6 +186,7 @@ export default function About() {
                     src={item.src}
                     alt={item.title}
                     loading="lazy"
+                    style={{ objectPosition: item.focus || "center" }}
                     className="absolute inset-0 h-full w-full scale-105 object-cover transition duration-500 group-hover:scale-110"
                   />
                 ) : (
