@@ -12,11 +12,12 @@
 //      socials: { facebook, instagram, linkedin, email },
 //      bio: "Short paragraph about the officer.",
 //      contributions: ["Led X initiative", "Organized Y event"],
+//      experience: ["President — Club (SY 2024-2025)", "Officer — Society"],
 //      achievements: ["Outstanding Leader 2024", "Dean's Lister"],
 //    }
-//  Clicking an officer card opens a profile modal. `bio`, `contributions`, and
-//  `achievements` are optional — leave them empty until the survey responses
-//  come in, and the modal hides empty sections automatically.
+//  Clicking an officer card opens a profile modal. `bio`, `contributions`,
+//  `experience`, and `achievements` are optional — leave them empty and the
+//  modal hides empty sections automatically.
 //  `badge` groups officers into color-coded categories (see BADGE_STYLES in the
 //  Leadership component).
 // =============================================================================
@@ -27,6 +28,7 @@ const makeOfficers = (roster) =>
     socials: {},
     bio: "",
     contributions: [],
+    experience: [],
     achievements: [],
     ...o,
   }));
@@ -42,7 +44,21 @@ export const batches = [
       { name: "Yensid Ritchy Mimay", position: "President", badge: "Executive", photo: "/officers/Yensid.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Vonn Kendrick C. Pedrena", position: "Vice President — Internal", badge: "Executive", photo: "/officers/Kendrick.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Mariel Daniella P. Riquero", position: "Vice President — External", badge: "Executive", photo: "/officers/Mariel.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Justin Emmanuel J. Janda", position: "Secretary", badge: "Secretariat", photo: "/officers/Justin.jpg", socials: { facebook: "#", instagram: "#" } },
+      {
+        name: "Justin Emmanuel J. Janda",
+        position: "Secretary",
+        badge: "Secretariat",
+        photo: "/officers/Justin.jpg",
+        department: "BS Computer Science with Specialization in Software Engineering — 3rd Year",
+        socials: { facebook: "#", instagram: "#" },
+        bio: "I envision myself as a dedicated and organized leader, a leader who emphasizes the importance of accountability, communication, and teamwork. I aim to help create an organization that fosters a safe space where students can freely be themselves while remaining coordinated, transparent, and connected.",
+        experience: [
+          "President — ACMFEUASC (S.Y. 2025 – 2026)",
+          "Communications Junior Officer — ACMFEUASC (S.Y. 2024 – 2025)",
+          "Programs Committee — FEU Alabang Freshmen Society (S.Y. 2024 – 2025)",
+          "Secretariat Head — CS Technofair 2026",
+        ],
+      },
       { name: "Gabriel Montales", position: "Assistant Secretary", badge: "Secretariat", photo: "/officers/Gab.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Allan Matthew C. Callao", position: "Treasurer", badge: "Finance", photo: "/officers/Matthew.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Nathalie H. Colico", position: "Auditor", badge: "Finance", photo: "/officers/Thalia.jpg", socials: { facebook: "#", instagram: "#" } },

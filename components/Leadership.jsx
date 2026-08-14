@@ -13,6 +13,7 @@ import {
   Quote,
   Lightbulb,
   Award,
+  Briefcase,
   CheckCircle2,
   Sparkles,
 } from "lucide-react";
@@ -140,10 +141,12 @@ function OfficerProfileModal({ officer, batch, onClose }) {
   const usingFallbackPhoto = photoSrc === FALLBACK_PHOTO;
   const hasBio = Boolean(officer.bio);
   const hasContribs = (officer.contributions || []).length > 0;
+  const hasExperience = (officer.experience || []).length > 0;
   const hasAchievements = (officer.achievements || []).length > 0;
   const hasSocials =
     officer.socials && Object.keys(officer.socials).length > 0;
-  const isEmpty = !hasBio && !hasContribs && !hasAchievements;
+  const isEmpty =
+    !hasBio && !hasContribs && !hasExperience && !hasAchievements;
 
   return (
     <div
@@ -231,6 +234,22 @@ function OfficerProfileModal({ officer, batch, onClose }) {
                   <li key={i} className="flex gap-2 text-sm text-slate-600">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-feu-teal" />
                     <span>{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {hasExperience && (
+            <section className="mt-5">
+              <h4 className="flex items-center gap-2 text-sm font-bold text-feu-green">
+                <Briefcase className="h-4 w-4" /> Leadership Experience
+              </h4>
+              <ul className="mt-2 space-y-2">
+                {officer.experience.map((x, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-slate-600">
+                    <Briefcase className="mt-0.5 h-4 w-4 shrink-0 text-feu-teal" />
+                    <span>{x}</span>
                   </li>
                 ))}
               </ul>
