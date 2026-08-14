@@ -59,7 +59,7 @@ export const batches = [
       { name: "Nathanael V. Ragasa", position: "President", badge: "Executive", photo: "/officers/Nigel.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Yensid Ritchy Mimay", position: "Vice President — Internal", badge: "Executive", photo: "/officers/Yensid.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Vonn Kendrick C. Pedrena", position: "Vice President — External", badge: "Executive", photo: "/officers/Kendrick.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Gabriel Montales", position: "Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
+      { name: "Gabriel Montales", position: "Secretary", badge: "Secretariat", photo: "/officers/Gab.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "TBA", position: "Assistant Secretary", badge: "Secretariat", socials: { facebook: "#", instagram: "#" } },
       { name: "Nathalie H. Colico", position: "Treasurer", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
       { name: "TBA", position: "Auditor", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
