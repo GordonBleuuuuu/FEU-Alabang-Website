@@ -88,10 +88,10 @@ export const batches = [
     tagline: "Expanding programs and deepening community impact.",
     officers: makeOfficers([
       { name: "Alejandro Marcus Cu", position: "President", badge: "Executive", photo: "/officers/Ali.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Rheigne Ily Lasam", position: "Vice President — External", badge: "Executive", photo: "/officers/Ily.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Aster Joy Peralta", position: "Vice President — Internal", badge: "Executive", photo: "/officers/Aster.jpg", socials: { facebook: "#", instagram: "#" } },
+      { name: "Rheigne Ily Lasam", position: "Vice President — External Affairs", badge: "Executive", photo: "/officers/Ily.jpg", socials: { facebook: "#", instagram: "#" } },
+      { name: "Aster Joy Peralta", position: "Vice President — Internal Affairs", badge: "Executive", photo: "/officers/Aster.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Aubrey Diane Gatuatan", position: "Executive Secretary", badge: "Secretariat", photo: "/officers/Aubrey.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Dollie Prudence Yap", position: "Treasurer", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
+      { name: "Martin Matthew Ambayec", position: "Treasurer", badge: "Finance", photo: "/officers/Martin.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Mervin Kim Sumagui", position: "Public Relations Officer", badge: "Communications", photo: "/officers/Mervin.jpg", socials: { facebook: "#", instagram: "#" } },
     ]),
   },
