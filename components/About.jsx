@@ -8,7 +8,7 @@ const GALLERY = [
   { title: "Year End Leadership Training Seminar", span: "", tone: "from-feu-teal to-feu-moss" },
   { title: "ATam Esports Expo", span: "sm:col-span-2", tone: "from-feu-moss to-feu-green" },
   { title: "ATamforJuan", span: "", tone: "from-gold-deep to-feu-green", src: "/gallery/atamforjuan.jpg" },
-  { title: "Annual Student Recognition", span: "", tone: "from-feu-green to-gold-deep" },
+  { title: "Annual Student Recognition", span: "", tone: "from-feu-green to-gold-deep", src: "/gallery/annual-student-recognition.jpg" },
   { title: "ATamOneJam", span: "sm:col-span-2", tone: "from-feu-teal to-gold-deep", src: "/gallery/atamonejam.jpg" },
 ];
 
