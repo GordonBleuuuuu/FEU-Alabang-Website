@@ -76,7 +76,7 @@ export const batches = [
       { name: "Aster Joy Peralta", position: "President", badge: "Executive", photo: "/officers/Aster.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Trisha Grace Edang", position: "Vice President", badge: "Executive", socials: { facebook: "#", instagram: "#" } },
       { name: "Martin Matthew Ambayec", position: "Secretary", badge: "Secretariat", photo: "/officers/Martin.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Zeon Bretaña", position: "Treasurer", badge: "Finance", socials: { facebook: "#", instagram: "#" } },
+      { name: "Zeon Bretaña", position: "Treasurer", badge: "Finance", photo: "/officers/Zeon.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Vonn Kendrick C. Pedrena", position: "Public Relations Officer", badge: "Communications", photo: "/officers/Kendrick.jpg", socials: { facebook: "#", instagram: "#" } },
     ]),
   },
