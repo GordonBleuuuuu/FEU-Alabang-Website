@@ -2,14 +2,15 @@ import { Target, Eye, Quote, Camera, History, Milestone } from "lucide-react";
 
 // Gallery tiles. Add `src: "/gallery/file.jpg"` to any tile to show a real
 // photo; tiles without `src` render the gradient placeholder (tone).
+// Layout — 2 rows × 4 cols on desktop, with ATamOneJam as the 2×2 hero:
+//   [ OneJam  OneJam  |  YELTS   ATamforJuan ]
+//   [ OneJam  OneJam  |  ATamEx  AnnualSR    ]
 const GALLERY = [
-  { title: "General Assembly", span: "sm:col-span-2 sm:row-span-2", tone: "from-feu-green to-feu-teal" },
-  { title: "Community Outreach", span: "", tone: "from-gold to-gold-deep" },
+  { title: "ATamOneJam", span: "sm:col-span-2 sm:row-span-2", tone: "from-feu-teal to-gold-deep", src: "/gallery/atamonejam.jpg" },
   { title: "Year End Leadership Training Seminar", span: "", tone: "from-feu-teal to-feu-moss", src: "/gallery/yelts.jpg" },
-  { title: "ATam Esports Expo", span: "sm:col-span-2", tone: "from-feu-moss to-feu-green", src: "/gallery/atam-esports-expo.jpg" },
   { title: "ATamforJuan", span: "", tone: "from-gold-deep to-feu-green", src: "/gallery/atamforjuan.jpg" },
+  { title: "ATam Esports Expo", span: "", tone: "from-feu-moss to-feu-green", src: "/gallery/atam-esports-expo.jpg" },
   { title: "Annual Student Recognition", span: "", tone: "from-feu-green to-gold-deep", src: "/gallery/annual-student-recognition.jpg" },
-  { title: "ATamOneJam", span: "sm:col-span-2", tone: "from-feu-teal to-gold-deep", src: "/gallery/atamonejam.jpg" },
 ];
 
 export default function About() {
@@ -173,7 +174,7 @@ export default function About() {
             </p>
           </div>
 
-          <div className="grid auto-rows-[150px] grid-cols-2 gap-4 sm:auto-rows-[170px] sm:grid-cols-4">
+          <div className="grid auto-rows-[180px] grid-cols-2 gap-4 sm:auto-rows-[220px] sm:grid-cols-4">
             {GALLERY.map((item) => (
               <figure
                 key={item.title}
