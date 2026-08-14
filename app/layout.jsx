@@ -28,9 +28,7 @@ export const metadata = {
       "The Voice and Vision of the FEU Alabang Student Body. Empowered. United. Brave.",
     type: "website",
   },
-  icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-  },
+  // Favicon: Next.js auto-serves app/icon.png and app/apple-icon.png as icons.
 };
 
 export const viewport = {
