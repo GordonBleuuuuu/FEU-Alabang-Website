@@ -1,6 +1,5 @@
 import {
   CalendarClock,
-  HelpCircle,
   BookOpenCheck,
   Mail,
   MapPin,
@@ -10,8 +9,9 @@ import {
 } from "lucide-react";
 import ContactForm from "./ContactForm";
 import RsoForms from "./RsoForms";
+import StudentSupport from "./StudentSupport";
 
-// The Forms & Requests card is rendered by <RsoForms /> (it opens a modal).
+// Forms & Requests -> <RsoForms /> modal.  Help & Support -> <StudentSupport /> modal.
 const RESOURCES = [
   {
     icon: CalendarClock,
@@ -29,14 +29,6 @@ const RESOURCES = [
     action: "Open handbook",
     href: "https://drive.google.com/file/d/1TPZ1d-kJPaSAuvo4DrOLezMGtL122dZI/view",
     external: true,
-  },
-  {
-    icon: HelpCircle,
-    title: "Help & Support",
-    description:
-      "Reach the right committee for concerns, feedback, or assistance from the SCC.",
-    action: "Get help",
-    href: "#resources",
   },
 ];
 
@@ -88,6 +80,9 @@ export default function Resources() {
               </span>
             </a>
           ))}
+
+          {/* Help & Support — opens the Student Grievance Desk modal */}
+          <StudentSupport />
         </div>
 
         {/* Contact panel */}
