@@ -4,6 +4,7 @@ import About from "@/components/About";
 import Leadership from "@/components/Leadership";
 import Activities from "@/components/Activities";
 import Initiatives from "@/components/Initiatives";
+import Apply from "@/components/Apply";
 import Resources from "@/components/Resources";
 import Footer from "@/components/Footer";
 
@@ -16,6 +17,7 @@ export default function Home() {
       <Leadership />
       <Activities />
       <Initiatives />
+      <Apply />
       <Resources />
       <Footer />
     </main>

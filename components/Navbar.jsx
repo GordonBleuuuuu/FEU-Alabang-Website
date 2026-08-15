@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { label: "Leadership", href: "#leadership" },
   { label: "Activities", href: "#activities" },
   { label: "Initiatives", href: "#initiatives" },
+  { label: "Apply", href: "#apply" },
   { label: "Resources", href: "#resources" },
 ];
 
