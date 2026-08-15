@@ -10,7 +10,7 @@ const NAV_LINKS = [
   { label: "Leadership", href: "#leadership" },
   { label: "Activities", href: "#activities" },
   { label: "Initiatives", href: "#initiatives" },
-  { label: "Apply", href: "#apply" },
+  { label: "Apply", href: "#apply", highlight: true },
   { label: "Resources", href: "#resources" },
 ];
 
@@ -75,6 +75,29 @@ export default function Navbar() {
         <div className="hidden items-center gap-1 lg:flex">
           {NAV_LINKS.map((link) => {
             const isActive = active === link.href;
+            // "Highlight" links (like Apply) get a persistent gold ring + subtle
+            // pulse so they stand out from regular nav items.
+            if (link.highlight) {
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={`group relative ml-1 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition ${
+                    isActive
+                      ? "bg-gold text-feu-moss shadow-gold"
+                      : "bg-gold/15 text-gold ring-1 ring-gold/50 hover:bg-gold hover:text-feu-moss"
+                  }`}
+                >
+                  <span
+                    className={`h-2 w-2 rounded-full bg-gold ${
+                      isActive ? "" : "animate-pulse ring-2 ring-gold/40"
+                    }`}
+                    aria-hidden="true"
+                  />
+                  {link.label}
+                </a>
+              );
+            }
             return (
               <a
                 key={link.href}
@@ -125,9 +148,21 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-white/85 transition hover:bg-white/10 hover:text-white"
+              className={
+                link.highlight
+                  ? "flex items-center justify-between rounded-xl bg-gold/15 px-4 py-3 text-sm font-bold text-gold ring-1 ring-gold/50 transition hover:bg-gold hover:text-feu-moss"
+                  : "flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-white/85 transition hover:bg-white/10 hover:text-white"
+              }
             >
-              {link.label}
+              <span className="inline-flex items-center gap-2">
+                {link.highlight && (
+                  <span
+                    className="h-2 w-2 animate-pulse rounded-full bg-gold ring-2 ring-gold/40"
+                    aria-hidden="true"
+                  />
+                )}
+                {link.label}
+              </span>
               <ChevronRight className="h-4 w-4 text-gold" />
             </a>
           ))}
