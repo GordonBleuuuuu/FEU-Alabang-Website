@@ -111,6 +111,9 @@ export const batches = [
         socials: { facebook: "#", instagram: "#" },
         bio: "I envision myself as a dedicated and organized leader, a leader who emphasizes the importance of accountability, communication, and teamwork. I aim to help create an organization that fosters a safe space where students can freely be themselves while remaining coordinated, transparent, and connected.",
         experience: [
+          "Director for Events — ACM FEU Alabang Student Chapter (ACMFEUASC), S.Y. 2026 – 2027",
+          "Director for Programs — Recreation and Athletics Club (RAC), S.Y. 2026 – 2027",
+          "Director for Membership — Apex Tamaraws (APT), S.Y. 2026 – 2027",
           "President — ACMFEUASC (S.Y. 2025 – 2026)",
           "Communications Junior Officer — ACMFEUASC (S.Y. 2024 – 2025)",
           "Programs Committee — FEU Alabang Freshmen Society (S.Y. 2024 – 2025)",
