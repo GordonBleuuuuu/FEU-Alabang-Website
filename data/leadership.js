@@ -86,7 +86,22 @@ export const batches = [
           "Member — ATamForJuan Mangrove Tree Planting (2024 – 2025)",
         ],
       },
-      { name: "Mariel Daniella P. Riquero", position: "Vice President — External", badge: "Executive", photo: "/officers/Mariel.jpg", socials: { facebook: "#", instagram: "#" } },
+      {
+        name: "Mariel Daniella P. Riquero",
+        position: "Vice President — External",
+        badge: "Executive",
+        photo: "/officers/Mariel.jpg",
+        department: "Bachelor of Science in Civil Engineering",
+        socials: { facebook: "#", instagram: "#" },
+        bio: "“Serve with a heart, Lead with purpose.” These words remain engraved in whatever vision she chooses to put light into, always bringing her back to the reason why she serves: for the people and for all the reasons behind everything. She wants to create a more meaningful and positive environment where everyone will be lighted, given their own spotlight, and empowered to grow in their own unique way.",
+        experience: [
+          "President — Association of Civil Engineering Students (S.Y. 2025 – 2026)",
+          "Chairwoman — College of Engineering (S.Y. 2025 – 2026)",
+          "Secretary — Tertiary Honor Society (S.Y. 2024 – 2025)",
+          "Programs Director — FEU Alabang Freshmen Society (S.Y. 2024 – 2025)",
+          "1st Year Batch Representative — Association of Civil Engineering Students (S.Y. 2024 – 2025)",
+        ],
+      },
       {
         name: "Justin Emmanuel J. Janda",
         position: "Secretary",
