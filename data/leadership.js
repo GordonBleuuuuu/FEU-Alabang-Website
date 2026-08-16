@@ -42,7 +42,7 @@ export const batches = [
     tagline: "The current active term — leading FEU Alabang forward.",
     officers: makeOfficers([
       {
-        name: "Yensid Ritchy Mimay",
+        name: "Yensid Ritchy A. Mimay",
         position: "President",
         badge: "Executive",
         photo: "/officers/Yensid.jpg",
@@ -117,7 +117,7 @@ export const batches = [
     officers: makeOfficers([
       { name: "Nathanael V. Ragasa", position: "President", badge: "Executive", photo: "/officers/Nigel.jpg", socials: { facebook: "#", instagram: "#" } },
       {
-        name: "Yensid Ritchy Mimay",
+        name: "Yensid Ritchy A. Mimay",
         position: "Vice President — Internal",
         badge: "Executive",
         photo: "/officers/Yensid.jpg",
