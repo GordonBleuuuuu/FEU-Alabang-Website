@@ -10,24 +10,162 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
-  Mail,
   Bell,
   Info,
+  Clock,
+  CalendarDays,
+  HelpCircle,
+  ChevronDown,
+  ArrowRight,
+  Repeat,
 } from "lucide-react";
 import {
   APPLICATIONS_OPEN,
-  APPLICATIONS_OPEN_DATE,
+  APPLICATION_CYCLE,
+  TIMELINE,
   committees,
+  FAQ,
 } from "@/data/committees";
+import Countdown from "./Countdown";
 
-// Both the application form and the notify-me signup post to the same
-// Forminit endpoint used by the rest of the site. Category blocks let ASCC
-// triage in the Forminit dashboard.
+// Both the application form and the notify-me signup post to the same Forminit
+// endpoint. Each submission is tagged via fi-select-category so ASCC can triage.
 const FORMINIT_ENDPOINT =
   process.env.NEXT_PUBLIC_FORMINIT_ENDPOINT ||
   "https://forminit.com/f/ngl6g12r2nj";
 
-// ---------------- Notify-me signup (shown while APPLICATIONS_OPEN is false)
+// ---------- Timeline strip ----------
+function TimelineStrip() {
+  return (
+    <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {TIMELINE.map((t, i) => (
+        <li
+          key={t.step}
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm"
+        >
+          <div className="flex items-start gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gold text-sm font-black text-feu-moss shadow-gold">
+              {t.step}
+            </span>
+            <div className="min-w-0">
+              <div className="text-[0.7rem] font-semibold uppercase tracking-wider text-gold">
+                {t.date}
+              </div>
+              <div className="mt-0.5 text-base font-black">{t.title}</div>
+              <p className="mt-1 text-xs leading-relaxed text-white/70">
+                {t.description}
+              </p>
+            </div>
+          </div>
+          {i < TIMELINE.length - 1 && (
+            <ArrowRight className="pointer-events-none absolute -right-2 top-1/2 hidden h-6 w-6 -translate-y-1/2 text-gold/40 lg:block" />
+          )}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+// ---------- Committee cards ----------
+function CommitteesGrid() {
+  if (!committees.length) return null;
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+      {committees.map((c) => (
+        <article
+          key={c.name}
+          className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm transition hover:border-gold/40 hover:bg-white/[0.08]"
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-gold" />
+            <h4 className="text-lg font-black">{c.name}</h4>
+          </div>
+          {c.description ? (
+            <p className="mt-2 text-sm leading-relaxed text-white/70">
+              {c.description}
+            </p>
+          ) : null}
+
+          {(c.hoursPerWeek || c.meetingCadence) && (
+            <div className="mt-4 flex flex-wrap gap-2 text-xs">
+              {c.hoursPerWeek && (
+                <span className="pill bg-white/5 text-white/80 ring-1 ring-white/10">
+                  <Clock className="h-3 w-3" />
+                  {c.hoursPerWeek} / week
+                </span>
+              )}
+              {c.meetingCadence && (
+                <span className="pill bg-white/5 text-white/80 ring-1 ring-white/10">
+                  <CalendarDays className="h-3 w-3" />
+                  {c.meetingCadence}
+                </span>
+              )}
+            </div>
+          )}
+
+          {c.roles?.length ? (
+            <ul className="mt-4 space-y-2 border-t border-white/10 pt-4">
+              {c.roles.map((r) => (
+                <li key={r.name} className="text-sm">
+                  <div className="font-semibold text-gold">{r.name}</div>
+                  {r.description ? (
+                    <div className="text-white/60">{r.description}</div>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </article>
+      ))}
+    </div>
+  );
+}
+
+// ---------- FAQ accordion ----------
+function FaqList() {
+  const [openIdx, setOpenIdx] = useState(0);
+  if (!FAQ.length) return null;
+  return (
+    <div className="divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm">
+      {FAQ.map((item, i) => {
+        const isOpen = openIdx === i;
+        return (
+          <div key={item.q}>
+            <button
+              type="button"
+              onClick={() => setOpenIdx(isOpen ? -1 : i)}
+              aria-expanded={isOpen}
+              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-white/5"
+            >
+              <span className="flex items-center gap-3 text-sm font-semibold sm:text-base">
+                <HelpCircle className="h-4 w-4 shrink-0 text-gold" />
+                {item.q}
+              </span>
+              <ChevronDown
+                className={`h-4 w-4 shrink-0 text-gold transition ${
+                  isOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            <div
+              className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+                isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <p className="px-5 pb-4 text-sm leading-relaxed text-white/75">
+                  {item.a}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------- Notify-me signup (coming-soon state) ----------
 function NotifyMeForm() {
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
@@ -42,7 +180,6 @@ function NotifyMeForm() {
       return;
     }
     fd.delete("_hp");
-    fd.set("fi-sender-fullName", fd.get("fi-sender-fullName") || "Notify-me signup");
     fd.set("fi-select-category", "Notify-me — Applications");
     fd.set(
       "fi-text-message",
@@ -70,11 +207,13 @@ function NotifyMeForm() {
       setError("Network error — please try again shortly.");
     }
   };
-
   const submitting = status === "submitting";
 
   return (
-    <form onSubmit={handleSubmit} className="mt-8 grid gap-3 sm:grid-cols-[1fr_auto]">
+    <form
+      onSubmit={handleSubmit}
+      className="mt-8 grid gap-3 sm:grid-cols-[1fr_auto]"
+    >
       <div className="sm:col-span-2">
         <label htmlFor="notify-name" className="mb-1.5 block text-sm font-medium text-white/80">
           Full name
@@ -139,13 +278,13 @@ function NotifyMeForm() {
       />
 
       {status === "success" && (
-        <p className="sm:col-span-2 flex items-center gap-1.5 text-xs font-medium text-emerald-300">
+        <p className="flex items-center gap-1.5 text-xs font-medium text-emerald-300 sm:col-span-2">
           <CheckCircle2 className="h-3.5 w-3.5" />
           You&apos;re on the list — we&apos;ll email you the moment applications open.
         </p>
       )}
       {status === "error" && (
-        <p className="sm:col-span-2 flex items-center gap-1.5 text-xs font-medium text-red-300">
+        <p className="flex items-center gap-1.5 text-xs font-medium text-red-300 sm:col-span-2">
           <AlertCircle className="h-3.5 w-3.5" />
           {error}
         </p>
@@ -154,15 +293,17 @@ function NotifyMeForm() {
   );
 }
 
-// ---------------- Full application form (shown when APPLICATIONS_OPEN is true)
-function ApplicationForm({ committees }) {
+// ---------- Full application form (open state) ----------
+function ApplicationForm() {
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
-  const [committeeName, setCommitteeName] = useState(committees[0]?.name || "");
+  const [first, setFirst] = useState(committees[0]?.name || "");
+  const [second, setSecond] = useState("");
+  const [third, setThird] = useState("");
 
-  const selectedCommittee = useMemo(
-    () => committees.find((c) => c.name === committeeName),
-    [committeeName, committees]
+  const firstCommittee = useMemo(
+    () => committees.find((c) => c.name === first),
+    [first]
   );
 
   const handleSubmit = async (e) => {
@@ -176,6 +317,9 @@ function ApplicationForm({ committees }) {
     }
     fd.delete("_hp");
     fd.set("fi-select-category", "Committee Application");
+    // Combine ranked choices into one readable field
+    const ranked = [first, second, third].filter(Boolean).join(" → ");
+    fd.set("fi-text-choices", ranked);
     setStatus("submitting");
     setError("");
     try {
@@ -187,8 +331,10 @@ function ApplicationForm({ committees }) {
       if (res.ok) {
         setStatus("success");
         form.reset();
-        setCommitteeName(committees[0]?.name || "");
-        setTimeout(() => setStatus("idle"), 6000);
+        setFirst(committees[0]?.name || "");
+        setSecond("");
+        setThird("");
+        setTimeout(() => setStatus("idle"), 8000);
       } else {
         const data = await res.json().catch(() => ({}));
         setStatus("error");
@@ -203,6 +349,10 @@ function ApplicationForm({ committees }) {
   const submitting = status === "submitting";
   const inputClass =
     "w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/30 disabled:opacity-60";
+
+  // Options for 2nd/3rd choice — exclude already-picked committees.
+  const optionsExcluding = (exclude) =>
+    committees.filter((c) => !exclude.includes(c.name));
 
   return (
     <form
@@ -234,37 +384,104 @@ function ApplicationForm({ committees }) {
           </label>
           <input id="ap-year" name="fi-text-year" type="text" required disabled={submitting} placeholder="e.g. 3rd year" className={inputClass} />
         </div>
-        <div>
-          <label htmlFor="ap-committee" className="mb-1.5 block text-sm font-medium text-white/85">
-            Committee you&apos;re applying to
-          </label>
-          <select
-            id="ap-committee"
-            name="fi-select-committee"
-            value={committeeName}
-            onChange={(e) => setCommitteeName(e.target.value)}
-            disabled={submitting}
-            className={inputClass}
-          >
-            {committees.map((c) => (
-              <option key={c.name} value={c.name}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+
+        {/* Ranked committee choices */}
+        <div className="sm:col-span-2 rounded-2xl border border-gold/25 bg-gold/5 p-4">
+          <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-gold">
+            <Repeat className="h-4 w-4" />
+            Rank your committee choices
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <label htmlFor="ap-first" className="mb-1.5 block text-xs font-medium text-white/70">
+                1st choice (required)
+              </label>
+              <select
+                id="ap-first"
+                name="fi-select-firstChoice"
+                value={first}
+                onChange={(e) => {
+                  setFirst(e.target.value);
+                  if (second === e.target.value) setSecond("");
+                  if (third === e.target.value) setThird("");
+                }}
+                required
+                disabled={submitting}
+                className={inputClass}
+              >
+                {committees.map((c) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="ap-second" className="mb-1.5 block text-xs font-medium text-white/70">
+                2nd choice (optional)
+              </label>
+              <select
+                id="ap-second"
+                name="fi-select-secondChoice"
+                value={second}
+                onChange={(e) => {
+                  setSecond(e.target.value);
+                  if (third === e.target.value) setThird("");
+                }}
+                disabled={submitting}
+                className={inputClass}
+              >
+                <option value="">— None —</option>
+                {optionsExcluding([first]).map((c) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="ap-third" className="mb-1.5 block text-xs font-medium text-white/70">
+                3rd choice (optional)
+              </label>
+              <select
+                id="ap-third"
+                name="fi-select-thirdChoice"
+                value={third}
+                onChange={(e) => setThird(e.target.value)}
+                disabled={submitting || !second}
+                className={inputClass}
+              >
+                <option value="">— None —</option>
+                {optionsExcluding([first, second]).map((c) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
+
         <div>
           <label htmlFor="ap-role" className="mb-1.5 block text-sm font-medium text-white/85">
-            Preferred role
+            Preferred role in your 1st choice
           </label>
-          <select id="ap-role" name="fi-select-role" disabled={submitting || !selectedCommittee} className={inputClass}>
-            {(selectedCommittee?.roles || []).map((r) => (
+          <select id="ap-role" name="fi-select-preferredRole" disabled={submitting || !firstCommittee} className={inputClass}>
+            {(firstCommittee?.roles || []).map((r) => (
               <option key={r.name} value={r.name}>
                 {r.name}
               </option>
             ))}
           </select>
         </div>
+        <div>
+          <label htmlFor="ap-contact" className="mb-1.5 block text-sm font-medium text-white/85">
+            Contact number
+            <span className="ml-1 text-xs font-normal text-white/50">(optional)</span>
+          </label>
+          <input id="ap-contact" name="fi-text-contact" type="tel" disabled={submitting} placeholder="09xx xxx xxxx" className={inputClass} />
+        </div>
+
         <div className="sm:col-span-2">
           <label htmlFor="ap-motivation" className="mb-1.5 block text-sm font-medium text-white/85">
             Why do you want to join?
@@ -284,20 +501,11 @@ function ApplicationForm({ committees }) {
         <div className="sm:col-span-2">
           <button type="submit" disabled={submitting} className="btn-gold w-full disabled:cursor-not-allowed disabled:opacity-70">
             {submitting ? (
-              <>
-                Submitting…
-                <Loader2 className="h-4 w-4 animate-spin" />
-              </>
+              <>Submitting… <Loader2 className="h-4 w-4 animate-spin" /></>
             ) : status === "success" ? (
-              <>
-                Application received!
-                <CheckCircle2 className="h-4 w-4" />
-              </>
+              <>Application received! <CheckCircle2 className="h-4 w-4" /></>
             ) : (
-              <>
-                Submit application
-                <Send className="h-4 w-4" />
-              </>
+              <>Submit application <Send className="h-4 w-4" /></>
             )}
           </button>
           {status === "success" && (
@@ -323,7 +531,7 @@ function ApplicationForm({ committees }) {
   );
 }
 
-// ---------------- Section
+// ============================================================================
 export default function Apply() {
   return (
     <section id="apply" className="relative overflow-hidden bg-feu-moss py-24 text-white">
@@ -339,10 +547,11 @@ export default function Apply() {
       <div className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-feu-teal/40 blur-3xl" />
 
       <div className="container-px relative">
+        {/* --- Header --- */}
         <div className="mx-auto max-w-2xl text-center">
           <span className="pill glass text-gold">
             <ClipboardList className="h-3.5 w-3.5" />
-            Join the Council
+            Join the Council · {APPLICATION_CYCLE.termLabel}
           </span>
           <h2 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">
             Apply to an SCC Committee
@@ -354,93 +563,90 @@ export default function Apply() {
           </p>
         </div>
 
-        {/* Coming-soon state */}
-        {!APPLICATIONS_OPEN && (
-          <div className="mx-auto mt-14 max-w-2xl rounded-3xl border border-white/10 bg-white/[0.05] p-8 backdrop-blur-xl sm:p-10">
-            <div className="flex flex-col items-center text-center">
-              <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gold text-feu-moss shadow-gold">
-                <Rocket className="h-7 w-7" />
-              </span>
-              <h3 className="mt-5 text-2xl font-black">
-                {APPLICATIONS_OPEN_DATE
-                  ? `Applications open ${APPLICATIONS_OPEN_DATE}`
-                  : "Applications open soon"}
-              </h3>
-              <p className="mt-3 max-w-md text-white/70">
-                Committee applications for the upcoming term are being
-                finalized. Drop your details and we&apos;ll email you the moment
-                the form goes live.
-              </p>
+        {/* --- Countdown --- */}
+        <div className="mt-10 flex flex-col items-center">
+          <div className="text-xs font-semibold uppercase tracking-widest text-gold/80">
+            {APPLICATIONS_OPEN
+              ? "Applications close in"
+              : "Applications open in"}
+          </div>
+          <div className="mt-3">
+            <Countdown
+              targetIso={
+                APPLICATIONS_OPEN
+                  ? APPLICATION_CYCLE.closesAt
+                  : APPLICATION_CYCLE.opensAt
+              }
+              passedLabel={
+                APPLICATIONS_OPEN ? "Applications closed" : "Now open!"
+              }
+            />
+          </div>
+        </div>
 
-              <div className="w-full max-w-md">
-                <NotifyMeForm />
+        {/* --- Timeline --- */}
+        <div className="mt-16">
+          <div className="mb-6 flex items-center gap-3">
+            <CalendarDays className="h-5 w-5 text-gold" />
+            <h3 className="text-xl font-black">Application timeline</h3>
+          </div>
+          <TimelineStrip />
+        </div>
+
+        {/* --- Committees --- */}
+        <div className="mt-16">
+          <div className="mb-6 flex items-center gap-3">
+            <Users className="h-5 w-5 text-gold" />
+            <h3 className="text-xl font-black">What you can join</h3>
+          </div>
+          <CommitteesGrid />
+        </div>
+
+        {/* --- Form area --- */}
+        <div className="mt-16">
+          {!APPLICATIONS_OPEN ? (
+            <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-white/[0.05] p-8 backdrop-blur-xl sm:p-10">
+              <div className="flex flex-col items-center text-center">
+                <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gold text-feu-moss shadow-gold">
+                  <Rocket className="h-7 w-7" />
+                </span>
+                <h3 className="mt-5 text-2xl font-black">
+                  Applications open soon
+                </h3>
+                <p className="mt-3 max-w-md text-white/70">
+                  Drop your details and we&apos;ll email you the moment the form
+                  goes live.
+                </p>
+                <div className="w-full max-w-md">
+                  <NotifyMeForm />
+                </div>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Open state — committees grid + application form */}
-        {APPLICATIONS_OPEN && (
-          <>
-            {committees.length > 0 && (
-              <div className="mt-14">
-                <div className="mb-6 flex items-center gap-3">
-                  <Users className="h-5 w-5 text-gold" />
-                  <h3 className="text-xl font-black">What you can join</h3>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {committees.map((c) => (
-                    <article
-                      key={c.name}
-                      className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition hover:border-gold/40 hover:bg-white/[0.08]"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-gold" />
-                        <h4 className="font-bold">{c.name}</h4>
-                      </div>
-                      {c.description ? (
-                        <p className="mt-1.5 text-sm text-white/70">
-                          {c.description}
-                        </p>
-                      ) : null}
-                      {c.roles && c.roles.length > 0 ? (
-                        <ul className="mt-3 space-y-2 border-t border-white/10 pt-3">
-                          {c.roles.map((r) => (
-                            <li key={r.name} className="text-sm">
-                              <div className="font-semibold text-gold">
-                                {r.name}
-                              </div>
-                              {r.description ? (
-                                <div className="text-white/60">
-                                  {r.description}
-                                </div>
-                              ) : null}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                    </article>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="mt-12">
+          ) : (
+            <>
               <div className="mb-4 flex items-center gap-2 text-sm text-white/70">
                 <Info className="h-4 w-4 text-gold" />
                 Every field is reviewed. Take your time — this is your pitch.
               </div>
               {committees.length > 0 ? (
-                <ApplicationForm committees={committees} />
+                <ApplicationForm />
               ) : (
                 <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 text-center text-sm text-white/70">
-                  <Mail className="mx-auto mb-3 h-6 w-6 text-gold" />
                   Committee list is being finalized. Please check back soon.
                 </div>
               )}
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
+
+        {/* --- FAQ --- */}
+        <div className="mt-16">
+          <div className="mb-6 flex items-center gap-3">
+            <HelpCircle className="h-5 w-5 text-gold" />
+            <h3 className="text-xl font-black">Frequently asked</h3>
+          </div>
+          <FaqList />
+        </div>
       </div>
     </section>
   );
