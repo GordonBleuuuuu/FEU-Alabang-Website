@@ -270,7 +270,7 @@ export const batches = [
         photo: "/officers/Ali.jpg",
         department: "Bachelor of Multimedia Arts",
         socials: { facebook: "#", instagram: "#" },
-        bio: "A voice-over artist, multimedia storyteller, and theatre lover who signs off every message with \"Yours in upright leadership.\" Ali served as SCC President for two consecutive terms (S.Y. 2022 – 2024), leading flagship programs like ATam Esports Expo, ATamOneJam, and ATamFamBam while founding student-run creative collectives — The Visionary Media Coalition, Feuture Acts, and TAMbayan TV — that gave ATamaraw creativity a lasting home on campus.",
+        bio: "A voice-over artist, multimedia storyteller, and theatre lover whose rallying cry — \"When in doubt, never alone but as a team. Be brave, kaya natin 'to!\" — still inspires every student leader who worked with him. Ali served as SCC President for two consecutive terms (S.Y. 2022 – 2024), leading flagship programs like ATam Esports Expo, ATamOneJam, and ATamFamBam while founding student-run creative collectives — The Visionary Media Coalition, Feuture Acts, and TAMbayan TV — that gave ATamaraw creativity a lasting home on campus. Even beyond thy happy halls, his name is still loud.",
         experience: [
           "President — Student Coordinating Council (SCC), S.Y. 2023 – 2024",
           "President — Student Coordinating Council (SCC), S.Y. 2022 – 2023",
@@ -318,7 +318,7 @@ export const batches = [
         photo: "/officers/Ali.jpg",
         department: "Bachelor of Multimedia Arts",
         socials: { facebook: "#", instagram: "#" },
-        bio: "A voice-over artist, multimedia storyteller, and theatre lover who signs off every message with \"Yours in upright leadership.\" Ali served as SCC President for two consecutive terms (S.Y. 2022 – 2024), leading flagship programs like ATam Esports Expo, ATamOneJam, and ATamFamBam while founding student-run creative collectives — The Visionary Media Coalition, Feuture Acts, and TAMbayan TV — that gave ATamaraw creativity a lasting home on campus.",
+        bio: "A voice-over artist, multimedia storyteller, and theatre lover whose rallying cry — \"When in doubt, never alone but as a team. Be brave, kaya natin 'to!\" — still inspires every student leader who worked with him. Ali served as SCC President for two consecutive terms (S.Y. 2022 – 2024), leading flagship programs like ATam Esports Expo, ATamOneJam, and ATamFamBam while founding student-run creative collectives — The Visionary Media Coalition, Feuture Acts, and TAMbayan TV — that gave ATamaraw creativity a lasting home on campus. Even beyond thy happy halls, his name is still loud.",
         experience: [
           "President — Student Coordinating Council (SCC), S.Y. 2023 – 2024",
           "President — Student Coordinating Council (SCC), S.Y. 2022 – 2023",
