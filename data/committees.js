@@ -10,6 +10,10 @@
 // ⚠️ TODO: flip to true when the application window is live.
 export const APPLICATIONS_OPEN = false;
 
+// Show/hide the live countdown timer. Keep false until real opens/closes
+// dates are set below — otherwise the countdown would tick to a placeholder.
+export const SHOW_COUNTDOWN = false;
+
 // -----------------------------------------------------------------------------
 // KEY DATES — used by the countdown timer, coming-soon banner, and timeline.
 // ⚠️ TODO: replace these with your real cycle dates before launch.

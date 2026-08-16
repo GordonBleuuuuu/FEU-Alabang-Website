@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import {
   APPLICATIONS_OPEN,
+  SHOW_COUNTDOWN,
   APPLICATION_CYCLE,
   TIMELINE,
   committees,
@@ -563,26 +564,28 @@ export default function Apply() {
           </p>
         </div>
 
-        {/* --- Countdown --- */}
-        <div className="mt-10 flex flex-col items-center">
-          <div className="text-xs font-semibold uppercase tracking-widest text-gold/80">
-            {APPLICATIONS_OPEN
-              ? "Applications close in"
-              : "Applications open in"}
+        {/* --- Countdown (hidden until SHOW_COUNTDOWN is flipped on) --- */}
+        {SHOW_COUNTDOWN && (
+          <div className="mt-10 flex flex-col items-center">
+            <div className="text-xs font-semibold uppercase tracking-widest text-gold/80">
+              {APPLICATIONS_OPEN
+                ? "Applications close in"
+                : "Applications open in"}
+            </div>
+            <div className="mt-3">
+              <Countdown
+                targetIso={
+                  APPLICATIONS_OPEN
+                    ? APPLICATION_CYCLE.closesAt
+                    : APPLICATION_CYCLE.opensAt
+                }
+                passedLabel={
+                  APPLICATIONS_OPEN ? "Applications closed" : "Now open!"
+                }
+              />
+            </div>
           </div>
-          <div className="mt-3">
-            <Countdown
-              targetIso={
-                APPLICATIONS_OPEN
-                  ? APPLICATION_CYCLE.closesAt
-                  : APPLICATION_CYCLE.opensAt
-              }
-              passedLabel={
-                APPLICATIONS_OPEN ? "Applications closed" : "Now open!"
-              }
-            />
-          </div>
-        </div>
+        )}
 
         {/* --- Timeline --- */}
         <div className="mt-16">
