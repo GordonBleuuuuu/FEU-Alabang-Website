@@ -41,7 +41,21 @@ export const batches = [
     active: true,
     tagline: "The current active term — leading FEU Alabang forward.",
     officers: makeOfficers([
-      { name: "Yensid Ritchy Mimay", position: "President", badge: "Executive", photo: "/officers/Yensid.jpg", socials: { facebook: "#", instagram: "#" } },
+      {
+        name: "Yensid Ritchy Mimay",
+        position: "President",
+        badge: "Executive",
+        photo: "/officers/Yensid.jpg",
+        department: "BSBA Marketing Management",
+        socials: { facebook: "#", instagram: "#" },
+        bio: "A leader who believes that empathy and compassion should be at the heart of service. She strives to lead with deep understanding by listening to the needs and experiences of others, and create an environment where every student feels heard, valued, and represented.",
+        experience: [
+          "President — Student Coordinating Council (SCC), S.Y. 2026 – 2027",
+          "Vice President of Internal Affairs — Student Coordinating Council (SCC), S.Y. 2025 – 2026",
+          "Director for Membership — Junior Business Executives (JUBEX), S.Y. 2025 – 2026",
+          "Director for Creatives — Freshmen Society (FSOC), S.Y. 2024 – 2025",
+        ],
+      },
       {
         name: "Vonn Kendrick C. Pedrena",
         position: "Vice President — Internal",
@@ -102,7 +116,21 @@ export const batches = [
     tagline: "Sustaining the momentum of student-led excellence.",
     officers: makeOfficers([
       { name: "Nathanael V. Ragasa", position: "President", badge: "Executive", photo: "/officers/Nigel.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Yensid Ritchy Mimay", position: "Vice President — Internal", badge: "Executive", photo: "/officers/Yensid.jpg", socials: { facebook: "#", instagram: "#" } },
+      {
+        name: "Yensid Ritchy Mimay",
+        position: "Vice President — Internal",
+        badge: "Executive",
+        photo: "/officers/Yensid.jpg",
+        department: "BSBA Marketing Management",
+        socials: { facebook: "#", instagram: "#" },
+        bio: "A leader who believes that empathy and compassion should be at the heart of service. She strives to lead with deep understanding by listening to the needs and experiences of others, and create an environment where every student feels heard, valued, and represented.",
+        experience: [
+          "President — Student Coordinating Council (SCC), S.Y. 2026 – 2027",
+          "Vice President of Internal Affairs — Student Coordinating Council (SCC), S.Y. 2025 – 2026",
+          "Director for Membership — Junior Business Executives (JUBEX), S.Y. 2025 – 2026",
+          "Director for Creatives — Freshmen Society (FSOC), S.Y. 2024 – 2025",
+        ],
+      },
       {
         name: "Vonn Kendrick C. Pedrena",
         position: "Vice President — External",
