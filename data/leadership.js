@@ -123,7 +123,22 @@ export const batches = [
       { name: "Gabriel Montales", position: "Assistant Secretary", badge: "Secretariat", photo: "/officers/Gab.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Allan Matthew C. Callao", position: "Treasurer", badge: "Finance", photo: "/officers/Matthew.jpg", socials: { facebook: "#", instagram: "#" } },
       { name: "Nathalie H. Colico", position: "Auditor", badge: "Finance", photo: "/officers/Thalia.jpg", socials: { facebook: "#", instagram: "#" } },
-      { name: "Nathanael Gerard V. Ragasa", position: "Public Relations Officer", badge: "Communications", photo: "/officers/Nigel.jpg", socials: { facebook: "#", instagram: "#" } },
+      {
+        name: "Nathanael Gerard V. Ragasa",
+        position: "Public Relations Officer",
+        badge: "Communications",
+        photo: "/officers/Nigel.jpg",
+        department: "BSBA Marketing Management and Multimedia Design",
+        socials: { facebook: "#", instagram: "#" },
+        bio: "The kuya of the whole campus who believes that there will always be talent within a person — it just needs to be tapped with the right leaders looking over them. He enhances the skills of others through various ways, letting them grow and be their own selves.",
+        experience: [
+          "Public Relations Officer — Student Coordinating Council (SCC), S.Y. 2026 – 2027",
+          "President — Student Coordinating Council (SCC), S.Y. 2025 – 2026",
+          "VPIA — FEU Alabang Freshmen Society, S.Y. 2024 – 2025",
+          "ASD Chairman, S.Y. 2024 – 2025",
+          "OIC for Publicity — Student Coordinating Council (SCC), S.Y. 2023 – 2024",
+        ],
+      },
     ]),
   },
   {
@@ -133,7 +148,22 @@ export const batches = [
     active: false,
     tagline: "Sustaining the momentum of student-led excellence.",
     officers: makeOfficers([
-      { name: "Nathanael V. Ragasa", position: "President", badge: "Executive", photo: "/officers/Nigel.jpg", socials: { facebook: "#", instagram: "#" } },
+      {
+        name: "Nathanael Gerard V. Ragasa",
+        position: "President",
+        badge: "Executive",
+        photo: "/officers/Nigel.jpg",
+        department: "BSBA Marketing Management and Multimedia Design",
+        socials: { facebook: "#", instagram: "#" },
+        bio: "The kuya of the whole campus who believes that there will always be talent within a person — it just needs to be tapped with the right leaders looking over them. He enhances the skills of others through various ways, letting them grow and be their own selves.",
+        experience: [
+          "Public Relations Officer — Student Coordinating Council (SCC), S.Y. 2026 – 2027",
+          "President — Student Coordinating Council (SCC), S.Y. 2025 – 2026",
+          "VPIA — FEU Alabang Freshmen Society, S.Y. 2024 – 2025",
+          "ASD Chairman, S.Y. 2024 – 2025",
+          "OIC for Publicity — Student Coordinating Council (SCC), S.Y. 2023 – 2024",
+        ],
+      },
       {
         name: "Yensid Ritchy A. Mimay",
         position: "Vice President — Internal",
