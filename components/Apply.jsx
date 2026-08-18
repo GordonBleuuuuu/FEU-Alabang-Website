@@ -419,7 +419,7 @@ function ApplicationForm() {
                 className={inputClass}
               >
                 {committees.map((c) => (
-                  <option key={c.name} value={c.name}>
+                  <option key={c.name} value={c.name} className="bg-white text-ink">
                     {c.name}
                   </option>
                 ))}
@@ -440,9 +440,9 @@ function ApplicationForm() {
                 disabled={submitting}
                 className={inputClass}
               >
-                <option value="">— None —</option>
+                <option value="" className="bg-white text-ink">— None —</option>
                 {optionsExcluding([first]).map((c) => (
-                  <option key={c.name} value={c.name}>
+                  <option key={c.name} value={c.name} className="bg-white text-ink">
                     {c.name}
                   </option>
                 ))}
@@ -460,9 +460,9 @@ function ApplicationForm() {
                 disabled={submitting || !second}
                 className={inputClass}
               >
-                <option value="">— None —</option>
+                <option value="" className="bg-white text-ink">— None —</option>
                 {optionsExcluding([first, second]).map((c) => (
-                  <option key={c.name} value={c.name}>
+                  <option key={c.name} value={c.name} className="bg-white text-ink">
                     {c.name}
                   </option>
                 ))}
@@ -483,7 +483,7 @@ function ApplicationForm() {
               className={inputClass}
             >
               {firstCommittee.roles.map((r) => (
-                <option key={r.name} value={r.name}>
+                <option key={r.name} value={r.name} className="bg-white text-ink">
                   {r.name}
                 </option>
               ))}
