@@ -18,6 +18,9 @@ import {
   ChevronDown,
   ArrowRight,
   Repeat,
+  Paperclip,
+  FileText,
+  X,
 } from "lucide-react";
 import {
   APPLICATIONS_OPEN,
@@ -28,6 +31,10 @@ import {
   FAQ,
 } from "@/data/committees";
 import Countdown from "./Countdown";
+import { uploadApplicationPdf } from "@/lib/supabase";
+
+const MAX_FILE_MB = 5;
+const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
 
 // Both the application form and the notify-me signup post to the same Forminit
 // endpoint. Each submission is tagged via fi-select-category so ASCC can triage.
@@ -304,11 +311,44 @@ function ApplicationForm() {
   const [first, setFirst] = useState(committees[0]?.name || "");
   const [second, setSecond] = useState("");
   const [third, setThird] = useState("");
+  // Attached PDF (optional). `file` is the File object; `fileError` holds a
+  // local validation message so we don't reject the whole form for a bad file.
+  const [file, setFile] = useState(null);
+  const [fileError, setFileError] = useState("");
 
   const firstCommittee = useMemo(
     () => committees.find((c) => c.name === first),
     [first]
   );
+
+  const handleFileChange = (e) => {
+    const picked = e.target.files?.[0];
+    setFileError("");
+    if (!picked) {
+      setFile(null);
+      return;
+    }
+    if (picked.type !== "application/pdf") {
+      setFileError("Please upload a PDF file only.");
+      setFile(null);
+      e.target.value = "";
+      return;
+    }
+    if (picked.size > MAX_FILE_BYTES) {
+      setFileError(`File is too large. Max size is ${MAX_FILE_MB} MB.`);
+      setFile(null);
+      e.target.value = "";
+      return;
+    }
+    setFile(picked);
+  };
+
+  const clearFile = () => {
+    setFile(null);
+    setFileError("");
+    const input = document.getElementById("ap-resume");
+    if (input) input.value = "";
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -320,6 +360,9 @@ function ApplicationForm() {
       return;
     }
     fd.delete("_hp");
+    // The file input is uploaded separately (below); don't ship the binary
+    // to Forminit — we'd hit its free-tier limits.
+    fd.delete("resume-file");
     fd.set("fi-select-category", "Committee Application");
     // Combine ranked choices into one readable field
     const ranked = [first, second, third].filter(Boolean).join(" → ");
@@ -329,8 +372,25 @@ function ApplicationForm() {
     if (firstCommittee && firstCommittee.roles?.length === 1) {
       fd.set("fi-select-preferredRole", firstCommittee.roles[0].name);
     }
-    setStatus("submitting");
     setError("");
+
+    // Upload the PDF to Supabase Storage first, then attach the public URL
+    // to the Forminit submission so ASCC can download from the dashboard.
+    try {
+      if (file) {
+        setStatus("uploading");
+        const publicUrl = await uploadApplicationPdf(file);
+        fd.set("fi-text-resumeUrl", publicUrl);
+      }
+    } catch (err) {
+      setStatus("error");
+      setError(
+        "Couldn't upload your attachment. Please try again, or submit without it."
+      );
+      return;
+    }
+
+    setStatus("submitting");
     try {
       const res = await fetch(FORMINIT_ENDPOINT, {
         method: "POST",
@@ -343,6 +403,7 @@ function ApplicationForm() {
         setFirst(committees[0]?.name || "");
         setSecond("");
         setThird("");
+        clearFile();
         setTimeout(() => setStatus("idle"), 8000);
       } else {
         const data = await res.json().catch(() => ({}));
@@ -355,7 +416,8 @@ function ApplicationForm() {
     }
   };
 
-  const submitting = status === "submitting";
+  const busy = status === "submitting" || status === "uploading";
+  const submitting = busy; // legacy alias for existing disabled= props
   const inputClass =
     "w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/30 disabled:opacity-60";
 
@@ -512,11 +574,71 @@ function ApplicationForm() {
           <textarea id="ap-experience" name="fi-text-experience" rows={3} disabled={submitting} placeholder="Positions held, projects led, skills you'd bring…" className={`${inputClass} resize-none`} />
         </div>
 
+        {/* Resume / Portfolio PDF upload (optional) */}
+        <div className="sm:col-span-2">
+          <label htmlFor="ap-resume" className="mb-1.5 block text-sm font-medium text-white/85">
+            Resume / Portfolio (PDF)
+            <span className="ml-1 text-xs font-normal text-white/50">
+              (optional · max {MAX_FILE_MB} MB)
+            </span>
+          </label>
+          {!file ? (
+            <label
+              htmlFor="ap-resume"
+              className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-dashed border-white/25 bg-white/5 px-4 py-3 text-sm text-white/70 transition hover:border-gold/50 hover:bg-white/10 ${
+                submitting ? "pointer-events-none opacity-60" : ""
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Paperclip className="h-4 w-4 text-gold" />
+                Choose a PDF to attach
+              </span>
+              <span className="text-xs text-white/50">Browse…</span>
+            </label>
+          ) : (
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-white">
+              <span className="flex min-w-0 items-center gap-2">
+                <FileText className="h-4 w-4 shrink-0 text-gold" />
+                <span className="truncate">{file.name}</span>
+                <span className="shrink-0 text-xs text-white/50">
+                  · {(file.size / 1024).toFixed(0)} KB
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={clearFile}
+                disabled={submitting}
+                aria-label="Remove attachment"
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white disabled:opacity-50"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+          <input
+            id="ap-resume"
+            name="resume-file"
+            type="file"
+            accept="application/pdf,.pdf"
+            onChange={handleFileChange}
+            disabled={submitting}
+            className="hidden"
+          />
+          {fileError && (
+            <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-300">
+              <AlertCircle className="h-3.5 w-3.5" />
+              {fileError}
+            </p>
+          )}
+        </div>
+
         <input type="text" name="_hp" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" style={{ display: "none" }} />
 
         <div className="sm:col-span-2">
-          <button type="submit" disabled={submitting} className="btn-gold w-full disabled:cursor-not-allowed disabled:opacity-70">
-            {submitting ? (
+          <button type="submit" disabled={busy} className="btn-gold w-full disabled:cursor-not-allowed disabled:opacity-70">
+            {status === "uploading" ? (
+              <>Uploading attachment… <Loader2 className="h-4 w-4 animate-spin" /></>
+            ) : status === "submitting" ? (
               <>Submitting… <Loader2 className="h-4 w-4 animate-spin" /></>
             ) : status === "success" ? (
               <>Application received! <CheckCircle2 className="h-4 w-4" /></>
