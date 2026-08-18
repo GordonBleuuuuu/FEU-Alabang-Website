@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   ArrowRight,
 } from "lucide-react";
+import { insertSupportSubmission } from "@/lib/supabase";
 
 // -----------------------------------------------------------------------------
 // Direct Feedback / Student Grievance Desk
@@ -65,6 +66,13 @@ export default function StudentSupport() {
     }
     fd.delete("_hp");
 
+    // Capture the real submitter values BEFORE we overwrite them with anonymous
+    // placeholders for Forminit. Supabase keeps the true anonymous state.
+    const submitterName = (fd.get("fi-sender-fullName") || "").toString().trim();
+    const submitterEmail = (fd.get("fi-sender-email") || "").toString().trim();
+    const program = (fd.get("fi-text-program") || "").toString().trim();
+    const message = (fd.get("fi-text-message") || "").toString();
+
     // Anonymous submissions still need placeholder values so Forminit can
     // parse the sender block cleanly.
     if (anonymous) {
@@ -74,6 +82,22 @@ export default function StudentSupport() {
 
     setStatus("submitting");
     setError("");
+
+    // Dual-write: Supabase Postgres first (fail-soft), then Forminit for the
+    // email notification path.
+    try {
+      await insertSupportSubmission({
+        category,
+        is_anonymous: anonymous,
+        name: anonymous ? null : submitterName || null,
+        email: anonymous ? null : submitterEmail || null,
+        program: program || null,
+        message,
+      });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn("Supabase support_submissions insert failed:", err);
+    }
 
     try {
       const res = await fetch(FORMINIT_ENDPOINT, {
