@@ -7,12 +7,12 @@
 //  QUICK CHECKLIST — items marked ⚠️ TODO need your real data before launch.
 // =============================================================================
 
-// ⚠️ TODO: flip to true when the application window is live.
+// ⚠️ TODO: flip to true on Aug 19, 2026 when Batch 1 applications go live.
+// (After Batch 1 closes Aug 23, flip false again until Batch 2 opens Sept 24.)
 export const APPLICATIONS_OPEN = false;
 
-// Show/hide the live countdown timer. Keep false until real opens/closes
-// dates are set below — otherwise the countdown would tick to a placeholder.
-export const SHOW_COUNTDOWN = false;
+// Real dates are set — countdown is live and ticks to opensAt / closesAt below.
+export const SHOW_COUNTDOWN = true;
 
 // -----------------------------------------------------------------------------
 // KEY DATES — used by the countdown timer, coming-soon banner, and timeline.
@@ -20,14 +20,16 @@ export const SHOW_COUNTDOWN = false;
 // Use ISO strings so timezones stay correct. Times default to 23:59 PHT.
 // -----------------------------------------------------------------------------
 export const APPLICATION_CYCLE = {
-  // When the form goes live to accept submissions.
-  opensAt: "2026-12-01T09:00:00+08:00",
-  // Last moment applicants can submit.
-  closesAt: "2026-12-14T23:59:00+08:00",
-  // When interviews are scheduled to run.
-  interviewsWindow: "December 16 – 20, 2026",
-  // When accepted committee members are announced.
-  announcementDate: "December 22, 2026",
+  // Batch 1 window — the imminent one the countdown targets.
+  opensAt: "2026-08-19T09:00:00+08:00",
+  closesAt: "2026-08-23T23:59:00+08:00",
+  // Screening + interview windows (Batch 1).
+  screeningWindow: "August 29 – 31, 2026",
+  interviewsWindow: "September 1 – 2, 2026",
+  // Batch 2 window for late applicants.
+  batch2Window: "September 24 – 28, 2026",
+  // ⚠️ TODO: set the announcement date once final.
+  announcementDate: "TBA",
   // Term the accepted applicants will serve.
   termLabel: "S.Y. 2026 – 2027",
 };
@@ -39,26 +41,27 @@ export const APPLICATION_CYCLE = {
 export const TIMELINE = [
   {
     step: "1",
-    title: "Applications Open",
-    date: "Dec 1 – 14, 2026",
-    description: "Submit your application through the form below.",
+    title: "Applications",
+    date: "Batch 1: Aug 19 – 23  ·  Batch 2: Sept 24 – 28, 2026",
+    description:
+      "Submit your application in either the Batch 1 or Batch 2 window.",
   },
   {
     step: "2",
     title: "Screening",
-    date: "Dec 15, 2026",
+    date: "August 29 – 31, 2026",
     description: "The SCC reviews every submission carefully.",
   },
   {
     step: "3",
     title: "Interviews",
-    date: "Dec 16 – 20, 2026",
+    date: "September 1 – 2, 2026",
     description: "Shortlisted applicants are invited to a short interview.",
   },
   {
     step: "4",
     title: "Announcement",
-    date: "Dec 22, 2026",
+    date: "TBA",
     description: "Accepted committee members are notified via email.",
   },
 ];
