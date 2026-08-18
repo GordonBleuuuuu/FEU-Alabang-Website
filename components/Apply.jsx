@@ -21,6 +21,8 @@ import {
   Paperclip,
   FileText,
   X,
+  Download,
+  FileDown,
 } from "lucide-react";
 import {
   APPLICATIONS_OPEN,
@@ -944,6 +946,49 @@ export default function Apply() {
             <h3 className="text-xl font-black">Application timeline</h3>
           </div>
           <TimelineStrip />
+        </div>
+
+        {/* --- Required document (Officer Information Sheet) --- */}
+        <div className="mt-16">
+          <div className="mb-6 flex items-center gap-3">
+            <FileDown className="h-5 w-5 text-gold" />
+            <h3 className="text-xl font-black">Required document</h3>
+          </div>
+          <div
+            className="flex flex-col items-start gap-5 rounded-3xl border p-6 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:p-8"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(255,183,3,0.10), rgba(15,82,87,0.20))",
+              borderColor: "rgba(255,183,3,0.35)",
+            }}
+          >
+            <div className="flex items-start gap-4">
+              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gold text-feu-moss shadow-gold">
+                <FileText className="h-7 w-7" />
+              </span>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wider text-gold">
+                  .docx · Fill out before applying
+                </div>
+                <h4 className="mt-1 text-lg font-black sm:text-xl">
+                  Officer Information Sheet
+                </h4>
+                <p className="mt-1 max-w-xl text-sm text-white/75">
+                  Download this Word file, fill out all your details, save it as
+                  a PDF, and upload it in the application form&apos;s attachment
+                  field.
+                </p>
+              </div>
+            </div>
+            <a
+              href="/003OFFICER%20INFORMATION%20SHEET.docx"
+              download="Officer Information Sheet.docx"
+              className="btn-gold shrink-0 self-stretch sm:self-auto"
+            >
+              <Download className="h-4 w-4" />
+              Download .docx
+            </a>
+          </div>
         </div>
 
         {/* --- Committees --- */}

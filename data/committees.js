@@ -198,6 +198,10 @@ export const FAQ = [
     a: "Yes. On the form you can rank up to three committee choices (1st, 2nd, and 3rd) and we'll try to match you with the best fit.",
   },
   {
+    q: "What is the Officer Information Sheet and do I need it?",
+    a: "It's a short Word document that captures the details we can't collect through the online form. Download it from the Required Document section above, fill it out, save it as a PDF, and upload it in the application form's attachment field.",
+  },
+  {
     q: "When will I hear back?",
     a: "Shortlisted applicants receive an interview invite within a few days after applications close. Final decisions are announced by email on the announcement date.",
   },
