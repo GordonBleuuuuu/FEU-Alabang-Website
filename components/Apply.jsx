@@ -35,6 +35,7 @@ import {
 import Countdown from "./Countdown";
 import {
   uploadApplicationPdf,
+  uploadSchoolIdFile,
   insertCommitteeApplication,
 } from "@/lib/supabase";
 
@@ -478,10 +479,14 @@ function NotifyMeForm() {
 function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }) {
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
-  // Attached PDF (optional). `file` is the File object; `fileError` holds a
-  // local validation message so we don't reject the whole form for a bad file.
+  // Attached files (both optional). `file` is the resume/portfolio PDF;
+  // `schoolIdFile` is the applicant's school ID (image or PDF).
   const [file, setFile] = useState(null);
   const [fileError, setFileError] = useState("");
+  const [schoolIdFile, setSchoolIdFile] = useState(null);
+  const [schoolIdError, setSchoolIdError] = useState("");
+  // Data Privacy Act consent — required to submit.
+  const [dpaConsent, setDpaConsent] = useState(false);
 
   const firstCommittee = useMemo(
     () => committees.find((c) => c.name === first),
@@ -517,6 +522,42 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
     if (input) input.value = "";
   };
 
+  // School ID accepts PDF or common image formats.
+  const SCHOOL_ID_TYPES = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ];
+  const handleSchoolIdChange = (e) => {
+    const picked = e.target.files?.[0];
+    setSchoolIdError("");
+    if (!picked) {
+      setSchoolIdFile(null);
+      return;
+    }
+    if (!SCHOOL_ID_TYPES.includes(picked.type)) {
+      setSchoolIdError("School ID must be a PDF, JPG, PNG, or WebP file.");
+      setSchoolIdFile(null);
+      e.target.value = "";
+      return;
+    }
+    if (picked.size > MAX_FILE_BYTES) {
+      setSchoolIdError(`File is too large. Max size is ${MAX_FILE_MB} MB.`);
+      setSchoolIdFile(null);
+      e.target.value = "";
+      return;
+    }
+    setSchoolIdFile(picked);
+  };
+
+  const clearSchoolId = () => {
+    setSchoolIdFile(null);
+    setSchoolIdError("");
+    const input = document.getElementById("ap-school-id");
+    if (input) input.value = "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -527,9 +568,19 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
       return;
     }
     fd.delete("_hp");
-    // The file input is uploaded separately (below); don't ship the binary
+    // Data Privacy Act consent guard.
+    if (!dpaConsent) {
+      setStatus("error");
+      setError(
+        "Please tick the Data Privacy Act consent below before submitting."
+      );
+      return;
+    }
+
+    // The file inputs are uploaded separately (below); don't ship the binaries
     // to Forminit — we'd hit its free-tier limits.
     fd.delete("resume-file");
+    fd.delete("school-id-file");
     fd.set("fi-select-category", "Committee Application");
     // Combine ranked choices into one readable field
     const ranked = [first, second, third].filter(Boolean).join(" → ");
@@ -541,13 +592,17 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
     }
     setError("");
 
-    // Upload the PDF to Supabase Storage first, then attach the public URL
-    // to the Forminit submission so ASCC can download from the dashboard.
+    // Upload attached files to Supabase Storage first, then attach their public
+    // URLs to the Forminit submission so ASCC can download from the dashboard.
     try {
+      if (file || schoolIdFile) setStatus("uploading");
       if (file) {
-        setStatus("uploading");
         const publicUrl = await uploadApplicationPdf(file);
         fd.set("fi-text-resumeUrl", publicUrl);
+      }
+      if (schoolIdFile) {
+        const publicUrl = await uploadSchoolIdFile(schoolIdFile);
+        fd.set("fi-text-schoolIdUrl", publicUrl);
       }
     } catch (err) {
       setStatus("error");
@@ -576,11 +631,17 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
         motivation: fd.get("fi-text-motivation"),
         past_experience: fd.get("fi-text-experience") || null,
         resume_url: fd.get("fi-text-resumeUrl") || null,
+        school_id_url: fd.get("fi-text-schoolIdUrl") || null,
+        dpa_consent: true,
       });
     } catch (err) {
       // eslint-disable-next-line no-console
       console.warn("Supabase committee_applications insert failed:", err);
     }
+
+    // Include DPA consent in the Forminit payload too, so ASCC's email trail
+    // records that the applicant agreed.
+    fd.set("fi-text-dpaConsent", "Yes — agreed to Data Privacy Act consent");
 
     try {
       const res = await fetch(FORMINIT_ENDPOINT, {
@@ -595,6 +656,8 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
         setSecond("");
         setThird("");
         clearFile();
+        clearSchoolId();
+        setDpaConsent(false);
         setTimeout(() => setStatus("idle"), 8000);
       } else {
         const data = await res.json().catch(() => ({}));
@@ -766,68 +829,172 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
           <textarea id="ap-experience" name="fi-text-experience" rows={3} disabled={submitting} placeholder="Positions held, projects led, skills you'd bring…" className={`${inputClass} resize-none`} />
         </div>
 
-        {/* Resume / Portfolio PDF upload (optional) */}
+        {/* Attachments — two file inputs side-by-side */}
+        <div className="sm:col-span-2 grid gap-4 sm:grid-cols-2">
+          {/* Resume / Portfolio PDF (optional) */}
+          <div>
+            <label htmlFor="ap-resume" className="mb-1.5 block text-sm font-medium text-white/85">
+              Resume / Portfolio (PDF)
+              <span className="ml-1 text-xs font-normal text-white/50">
+                (optional · max {MAX_FILE_MB} MB)
+              </span>
+            </label>
+            {!file ? (
+              <label
+                htmlFor="ap-resume"
+                className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-dashed border-white/25 bg-white/5 px-4 py-3 text-sm text-white/70 transition hover:border-gold/50 hover:bg-white/10 ${
+                  submitting ? "pointer-events-none opacity-60" : ""
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Paperclip className="h-4 w-4 text-gold" />
+                  Choose a PDF
+                </span>
+                <span className="text-xs text-white/50">Browse…</span>
+              </label>
+            ) : (
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-white">
+                <span className="flex min-w-0 items-center gap-2">
+                  <FileText className="h-4 w-4 shrink-0 text-gold" />
+                  <span className="truncate">{file.name}</span>
+                  <span className="shrink-0 text-xs text-white/50">
+                    · {(file.size / 1024).toFixed(0)} KB
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  onClick={clearFile}
+                  disabled={submitting}
+                  aria-label="Remove attachment"
+                  className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white disabled:opacity-50"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+            <input
+              id="ap-resume"
+              name="resume-file"
+              type="file"
+              accept="application/pdf,.pdf"
+              onChange={handleFileChange}
+              disabled={submitting}
+              className="hidden"
+            />
+            {fileError && (
+              <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-300">
+                <AlertCircle className="h-3.5 w-3.5" />
+                {fileError}
+              </p>
+            )}
+          </div>
+
+          {/* School ID upload (optional — PDF or image) */}
+          <div>
+            <label htmlFor="ap-school-id" className="mb-1.5 block text-sm font-medium text-white/85">
+              School ID (PDF or image)
+              <span className="ml-1 text-xs font-normal text-white/50">
+                (optional · max {MAX_FILE_MB} MB)
+              </span>
+            </label>
+            {!schoolIdFile ? (
+              <label
+                htmlFor="ap-school-id"
+                className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-dashed border-white/25 bg-white/5 px-4 py-3 text-sm text-white/70 transition hover:border-gold/50 hover:bg-white/10 ${
+                  submitting ? "pointer-events-none opacity-60" : ""
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Paperclip className="h-4 w-4 text-gold" />
+                  Choose a file
+                </span>
+                <span className="text-xs text-white/50">Browse…</span>
+              </label>
+            ) : (
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-white">
+                <span className="flex min-w-0 items-center gap-2">
+                  <FileText className="h-4 w-4 shrink-0 text-gold" />
+                  <span className="truncate">{schoolIdFile.name}</span>
+                  <span className="shrink-0 text-xs text-white/50">
+                    · {(schoolIdFile.size / 1024).toFixed(0)} KB
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  onClick={clearSchoolId}
+                  disabled={submitting}
+                  aria-label="Remove school ID"
+                  className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white disabled:opacity-50"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+            <input
+              id="ap-school-id"
+              name="school-id-file"
+              type="file"
+              accept="application/pdf,image/jpeg,image/png,image/webp,.pdf,.jpg,.jpeg,.png,.webp"
+              onChange={handleSchoolIdChange}
+              disabled={submitting}
+              className="hidden"
+            />
+            {schoolIdError && (
+              <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-300">
+                <AlertCircle className="h-3.5 w-3.5" />
+                {schoolIdError}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Data Privacy Act consent — required */}
         <div className="sm:col-span-2">
-          <label htmlFor="ap-resume" className="mb-1.5 block text-sm font-medium text-white/85">
-            Resume / Portfolio (PDF)
-            <span className="ml-1 text-xs font-normal text-white/50">
-              (optional · max {MAX_FILE_MB} MB)
+          <label
+            className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${
+              dpaConsent
+                ? "border-gold/50 bg-gold/10"
+                : "border-white/15 bg-white/5 hover:border-gold/30 hover:bg-white/10"
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={dpaConsent}
+              onChange={(e) => {
+                setDpaConsent(e.target.checked);
+                if (e.target.checked) setError("");
+              }}
+              disabled={submitting}
+              className="mt-0.5 h-4 w-4 shrink-0 accent-gold"
+            />
+            <span className="text-sm text-white/85">
+              <span className="font-semibold text-gold">
+                Data Privacy Act consent (required)
+              </span>
+              <span className="mt-1 block text-xs leading-relaxed text-white/70">
+                I have read and freely consent to the collection, use, storage,
+                and processing of my personal information in accordance with the
+                <span className="font-semibold">
+                  {" "}
+                  Data Privacy Act of 2012 (R.A. 10173){" "}
+                </span>
+                for the sole purpose of my SCC Committee Application. My data
+                will be handled confidentially by the FEU Alabang Student
+                Coordinating Council and will not be shared with third parties.
+              </span>
             </span>
           </label>
-          {!file ? (
-            <label
-              htmlFor="ap-resume"
-              className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-dashed border-white/25 bg-white/5 px-4 py-3 text-sm text-white/70 transition hover:border-gold/50 hover:bg-white/10 ${
-                submitting ? "pointer-events-none opacity-60" : ""
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <Paperclip className="h-4 w-4 text-gold" />
-                Choose a PDF to attach
-              </span>
-              <span className="text-xs text-white/50">Browse…</span>
-            </label>
-          ) : (
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-white">
-              <span className="flex min-w-0 items-center gap-2">
-                <FileText className="h-4 w-4 shrink-0 text-gold" />
-                <span className="truncate">{file.name}</span>
-                <span className="shrink-0 text-xs text-white/50">
-                  · {(file.size / 1024).toFixed(0)} KB
-                </span>
-              </span>
-              <button
-                type="button"
-                onClick={clearFile}
-                disabled={submitting}
-                aria-label="Remove attachment"
-                className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white disabled:opacity-50"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-          <input
-            id="ap-resume"
-            name="resume-file"
-            type="file"
-            accept="application/pdf,.pdf"
-            onChange={handleFileChange}
-            disabled={submitting}
-            className="hidden"
-          />
-          {fileError && (
-            <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-300">
-              <AlertCircle className="h-3.5 w-3.5" />
-              {fileError}
-            </p>
-          )}
         </div>
 
         <input type="text" name="_hp" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" style={{ display: "none" }} />
 
         <div className="sm:col-span-2">
-          <button type="submit" disabled={busy} className="btn-gold w-full disabled:cursor-not-allowed disabled:opacity-70">
+          <button
+            type="submit"
+            disabled={busy || !dpaConsent}
+            title={!dpaConsent ? "Please tick the Data Privacy consent above" : ""}
+            className="btn-gold w-full disabled:cursor-not-allowed disabled:opacity-70"
+          >
             {status === "uploading" ? (
               <>Uploading attachment… <Loader2 className="h-4 w-4 animate-spin" /></>
             ) : status === "submitting" ? (
