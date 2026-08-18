@@ -104,17 +104,20 @@ function CommitteesGrid() {
             </div>
           )}
 
-          {c.roles?.length ? (
-            <ul className="mt-4 space-y-2 border-t border-white/10 pt-4">
-              {c.roles.map((r) => (
-                <li key={r.name} className="text-sm">
-                  <div className="font-semibold text-gold">{r.name}</div>
-                  {r.description ? (
-                    <div className="text-white/60">{r.description}</div>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
+          {c.responsibilities?.length ? (
+            <div className="mt-4 border-t border-white/10 pt-4">
+              <div className="mb-2 text-[0.7rem] font-semibold uppercase tracking-wider text-gold">
+                Main Responsibilities
+              </div>
+              <ul className="space-y-2 text-sm text-white/70">
+                {c.responsibilities.map((r, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
+                    <span>{r}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ) : null}
         </article>
       ))}
@@ -321,6 +324,11 @@ function ApplicationForm() {
     // Combine ranked choices into one readable field
     const ranked = [first, second, third].filter(Boolean).join(" → ");
     fd.set("fi-text-choices", ranked);
+    // When the committee only offers one role, the dropdown is hidden — inject
+    // the default role so Forminit still receives the field.
+    if (firstCommittee && firstCommittee.roles?.length === 1) {
+      fd.set("fi-select-preferredRole", firstCommittee.roles[0].name);
+    }
     setStatus("submitting");
     setError("");
     try {
@@ -463,18 +471,25 @@ function ApplicationForm() {
           </div>
         </div>
 
-        <div>
-          <label htmlFor="ap-role" className="mb-1.5 block text-sm font-medium text-white/85">
-            Preferred role in your 1st choice
-          </label>
-          <select id="ap-role" name="fi-select-preferredRole" disabled={submitting || !firstCommittee} className={inputClass}>
-            {(firstCommittee?.roles || []).map((r) => (
-              <option key={r.name} value={r.name}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {firstCommittee?.roles && firstCommittee.roles.length > 1 && (
+          <div>
+            <label htmlFor="ap-role" className="mb-1.5 block text-sm font-medium text-white/85">
+              Preferred role in your 1st choice
+            </label>
+            <select
+              id="ap-role"
+              name="fi-select-preferredRole"
+              disabled={submitting}
+              className={inputClass}
+            >
+              {firstCommittee.roles.map((r) => (
+                <option key={r.name} value={r.name}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div>
           <label htmlFor="ap-contact" className="mb-1.5 block text-sm font-medium text-white/85">
             Contact number

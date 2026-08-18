@@ -73,52 +73,106 @@ export const TIMELINE = [
 // -----------------------------------------------------------------------------
 export const committees = [
   {
-    name: "Events Committee",
+    name: "Programs Committee",
     description:
-      "Plans and executes the SCC's flagship programs — ATamEx, ATamOneJam, ATamForJuan, and more.",
-    hoursPerWeek: "5 – 8 hrs",
-    meetingCadence: "Weekly + event days",
+      "Handles every detail about the events of the organization — from proposal-making to implementation.",
+    responsibilities: [
+      "Handles every detail about the events of the organization — from proposal making to implementation.",
+      "Initiates and prepares plans for the current and upcoming events / activities of the organization.",
+    ],
     roles: [
-      { name: "Head", description: "Leads the committee and coordinates with the executive board." },
-      { name: "Deputy Head", description: "Supports the Head and steps in when needed." },
-      { name: "Officer", description: "Assists in event logistics, promotions, and program flow." },
-      { name: "Member", description: "Volunteers on event day and helps with preparation." },
+      { name: "Member", description: "Joins the Programs team to plan, coordinate, and run SCC events end-to-end." },
     ],
   },
   {
-    name: "Communications Committee",
+    name: "Logistics Committee",
     description:
-      "Owns the SCC voice online and offline — social media, publicity materials, and community engagement.",
-    hoursPerWeek: "4 – 6 hrs",
-    meetingCadence: "Weekly",
+      "Makes SCC events happen on the ground — resources, venue, setup, and equipment.",
+    responsibilities: [
+      "Allocates resources such as equipment, materials, and personnel needed for events, ensuring everything is available and in order.",
+      "Arranges venue set-up, signages, seating arrangements, and any necessary permits to ensure a smooth program.",
+      "Manages transportation of equipment to and from the venue.",
+      "Coordinates a precise time for ingress and egress of the venue for the event set-up.",
+    ],
     roles: [
-      { name: "Head", description: "Sets the content strategy and manages the team." },
-      { name: "Content Writer", description: "Drafts captions, announcements, and articles." },
-      { name: "Graphic Designer", description: "Creates posters, banners, and social visuals." },
-      { name: "Photo / Video", description: "Documents SCC events and produces reels." },
+      { name: "Member", description: "Joins the Logistics team to handle setup, equipment, and on-site coordination for every SCC event." },
+    ],
+  },
+  {
+    name: "Secretariat Committee",
+    description:
+      "Keeps the paperwork, registration, and minutes running smoothly for every SCC activity.",
+    responsibilities: [
+      "Manages all paperwork (traditional and digital) for events / activities and internal purposes.",
+      "Handles the registration process in any event / activity.",
+      "Diligently attends all meetings and takes down minutes.",
+    ],
+    roles: [
+      { name: "Member", description: "Joins the Secretariat team to manage documents, registration, and meeting minutes." },
     ],
   },
   {
     name: "Finance Committee",
     description:
-      "Handles the SCC budget, liquidation, sponsorships, and event finance planning.",
-    hoursPerWeek: "3 – 5 hrs",
-    meetingCadence: "Bi-weekly",
+      "Guards the SCC's funds and keeps every peso transparent, tracked, and accounted for.",
+    responsibilities: [
+      "Accountable for the funds of the organization, and transparent to all transactions received and sent out.",
+      "Handles financial documents such as liquidation, statement of financial position, monthly reports, and other forms.",
+      "Assists the Treasurer and Auditor in their responsibilities.",
+      "Oversees and analyzes financial statements and the organization's budget.",
+    ],
     roles: [
-      { name: "Head", description: "Oversees all finance operations and reporting." },
-      { name: "Bookkeeper", description: "Tracks expenses and manages receipts." },
-      { name: "Sponsorship Officer", description: "Reaches out to partners and closes sponsorships." },
+      { name: "Member", description: "Joins the Finance team to help track funds, prepare reports, and support the Treasurer and Auditor." },
     ],
   },
   {
-    name: "External Affairs Committee",
+    name: "Publicity Committee",
     description:
-      "Represents the SCC to other councils, RSOs, and off-campus partners.",
-    hoursPerWeek: "3 – 5 hrs",
-    meetingCadence: "Bi-weekly",
+      "Formulates the strategies and messaging that make SCC events land with students.",
+    responsibilities: [
+      "Formulates effective strategies to promote events, activities, or initiatives, utilizing various communication channels to reach the target audience.",
+      "Generates engaging and compelling content, communicates key messages, and generates interest from the students.",
+      "Utilizes social media algorithms with effective scheduling, brand identity, and copywriting.",
+    ],
     roles: [
-      { name: "Head", description: "Builds and maintains external partnerships." },
-      { name: "Liaison", description: "Attends inter-council meetings on behalf of the SCC." },
+      { name: "Member", description: "Joins the Publicity team to craft messaging, campaigns, and social-media pushes for SCC events." },
+    ],
+  },
+  {
+    name: "Creatives Committee",
+    description:
+      "Produces the graphics and visuals that give every SCC event its signature look.",
+    responsibilities: [
+      "Produces a variety of traditional and digital publicity materials for events and internal purposes.",
+      "Engages viewers with eye-catching and vibrant graphics that boost awareness and visibility of an event or an announcement.",
+    ],
+    roles: [
+      { name: "Member", description: "Joins the Creatives team to design posters, banners, and social visuals for SCC events." },
+    ],
+  },
+  {
+    name: "Technicals Committee",
+    description:
+      "Runs the technical production behind SCC events — audio, video, lights, and streaming.",
+    responsibilities: [
+      "Manages technical production through utilizing technical equipment and online platforms used in events, such as audio, videos, and lighting tasks during activities / events.",
+      "Must be knowledgeable in any of the following: OBS Studio, Projector use, PAR Lights, DMX controllers, basic computer troubleshooting, VirtualDJ, basic audio mixer troubleshooting, and basic cable management.",
+    ],
+    roles: [
+      { name: "Member", description: "Joins the Technicals team to handle audio, video, lighting, and streaming for SCC events." },
+    ],
+  },
+  {
+    name: "Communications Committee",
+    description:
+      "Connects the SCC with external partners, sponsors, competitions, and outside inquiries.",
+    responsibilities: [
+      "Coordinates with external linkages related to sponsorship, partnership, outreach, collaboration, and the like.",
+      "Responsible for scouting inter-collegiate, national, and international competitions eligible for the university's participation.",
+      "Aids in responding to queries addressed to the council and refers them to the appropriate offices.",
+    ],
+    roles: [
+      { name: "Member", description: "Joins the Communications team to build external partnerships and represent SCC in inter-org linkages." },
     ],
   },
 ];
