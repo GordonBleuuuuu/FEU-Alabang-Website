@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ClipboardList,
   Users,
@@ -78,101 +78,221 @@ function TimelineStrip() {
 }
 
 // ---------- Committee cards ----------
-// When onSelect is provided, each card becomes an interactive button that
-// picks that committee as the applicant's 1st choice and scrolls the form
-// into view. The currently-selected committee shows a "1st choice" badge.
-function CommitteesGrid({ onSelect, selected }) {
+// Each card is a clickable button that opens the CommitteeDetailModal below,
+// letting applicants see the full responsibilities list in a spacious layout.
+// The currently-selected 1st choice keeps a subtle gold border so it stands out.
+function CommitteesGrid({ onOpen, selected }) {
   if (!committees.length) return null;
-  const interactive = typeof onSelect === "function";
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
       {committees.map((c) => {
-        const isSelected = interactive && selected === c.name;
-        const cardClass = `rounded-2xl border p-6 backdrop-blur-sm transition ${
+        const isSelected = selected === c.name;
+        const cardClass = `group w-full rounded-2xl border p-6 text-left backdrop-blur-sm transition ${
           isSelected
             ? "border-gold bg-gold/10 shadow-gold ring-1 ring-gold/40"
-            : "border-white/10 bg-white/[0.04] hover:border-gold/40 hover:bg-white/[0.08]"
-        } ${interactive ? "cursor-pointer text-left" : ""}`;
-        const commonProps = interactive
-          ? {
-              type: "button",
-              onClick: () => onSelect(c.name),
-              "aria-pressed": isSelected,
-              className: `${cardClass} w-full`,
-            }
-          : { className: cardClass };
-        const Wrapper = interactive ? "button" : "article";
+            : "border-white/10 bg-white/[0.04] hover:-translate-y-0.5 hover:border-gold/40 hover:bg-white/[0.08]"
+        } cursor-pointer`;
         return (
-          <Wrapper key={c.name} {...commonProps}>
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-gold" />
-              <h4 className="text-lg font-black">{c.name}</h4>
-            </div>
-            {isSelected && (
-              <span className="pill bg-gold text-feu-moss">
-                <CheckCircle2 className="h-3 w-3" />
-                1st choice
-              </span>
-            )}
-          </div>
-          {c.description ? (
-            <p className="mt-2 text-sm leading-relaxed text-white/70">
-              {c.description}
-            </p>
-          ) : null}
-
-          {(c.hoursPerWeek || c.meetingCadence) && (
-            <div className="mt-4 flex flex-wrap gap-2 text-xs">
-              {c.hoursPerWeek && (
-                <span className="pill bg-white/5 text-white/80 ring-1 ring-white/10">
-                  <Clock className="h-3 w-3" />
-                  {c.hoursPerWeek} / week
+          <button
+            key={c.name}
+            type="button"
+            onClick={() => onOpen(c)}
+            className={cardClass}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-gold" />
+                <h4 className="text-lg font-black">{c.name}</h4>
+              </div>
+              {isSelected && (
+                <span className="pill bg-gold text-feu-moss">
+                  <CheckCircle2 className="h-3 w-3" />
+                  1st choice
                 </span>
               )}
-              {c.meetingCadence && (
-                <span className="pill bg-white/5 text-white/80 ring-1 ring-white/10">
+            </div>
+
+            {c.description ? (
+              <p className="mt-2 text-sm leading-relaxed text-white/70">
+                {c.description}
+              </p>
+            ) : null}
+
+            {(c.hoursPerWeek || c.meetingCadence) && (
+              <div className="mt-4 flex flex-wrap gap-2 text-xs">
+                {c.hoursPerWeek && (
+                  <span className="pill bg-white/5 text-white/80 ring-1 ring-white/10">
+                    <Clock className="h-3 w-3" />
+                    {c.hoursPerWeek} / week
+                  </span>
+                )}
+                {c.meetingCadence && (
+                  <span className="pill bg-white/5 text-white/80 ring-1 ring-white/10">
+                    <CalendarDays className="h-3 w-3" />
+                    {c.meetingCadence}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {c.responsibilities?.length ? (
+              <p className="mt-4 border-t border-white/10 pt-4 text-xs text-white/60">
+                <span className="font-semibold uppercase tracking-wider text-gold">
+                  {c.responsibilities.length} responsibilities
+                </span>{" "}
+                — tap to view details
+              </p>
+            ) : null}
+
+            <div className="mt-3 flex items-center justify-end gap-1 text-xs font-semibold text-gold/80 transition group-hover:text-gold">
+              View details
+              <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------- Committee detail modal ----------
+// Opens on committee card click. Shows the full description + responsibilities
+// in a spacious layout, and (when applications are open) offers a prominent
+// "Choose this as 1st choice" button that selects + closes + scrolls to form.
+function CommitteeDetailModal({ committee, onClose, onChoose, selected }) {
+  useEffect(() => {
+    if (!committee) return;
+    const onKey = (e) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [committee, onClose]);
+
+  if (!committee) return null;
+  const isSelected = selected === committee.name;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="committee-detail-name"
+    >
+      <div
+        className="absolute inset-0 bg-ink/70 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      <div className="relative z-10 max-h-[88vh] w-full max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-white text-ink shadow-2xl animate-fade-up">
+        {/* Header */}
+        <div
+          className="relative p-6 text-white sm:p-8"
+          style={{ background: "linear-gradient(135deg, #004B23, #0F5257)" }}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-xl bg-white/10 text-white transition hover:bg-white/20"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <span className="pill bg-white/15 text-gold ring-1 ring-white/20">
+            <Sparkles className="h-3.5 w-3.5" />
+            SCC Committee
+          </span>
+          <h3
+            id="committee-detail-name"
+            className="mt-3 text-2xl font-black leading-tight sm:text-3xl"
+          >
+            {committee.name}
+          </h3>
+          {committee.description ? (
+            <p className="mt-2 max-w-xl text-sm text-white/85 sm:text-base">
+              {committee.description}
+            </p>
+          ) : null}
+          {(committee.hoursPerWeek || committee.meetingCadence) && (
+            <div className="mt-4 flex flex-wrap gap-2 text-xs">
+              {committee.hoursPerWeek && (
+                <span className="pill bg-white/10 text-white ring-1 ring-white/20">
+                  <Clock className="h-3 w-3" />
+                  {committee.hoursPerWeek} / week
+                </span>
+              )}
+              {committee.meetingCadence && (
+                <span className="pill bg-white/10 text-white ring-1 ring-white/20">
                   <CalendarDays className="h-3 w-3" />
-                  {c.meetingCadence}
+                  {committee.meetingCadence}
                 </span>
               )}
             </div>
           )}
+        </div>
 
-          {c.responsibilities?.length ? (
-            <div className="mt-4 border-t border-white/10 pt-4">
-              <div className="mb-2 text-[0.7rem] font-semibold uppercase tracking-wider text-gold">
-                Main Responsibilities
-              </div>
-              <ul className="space-y-2 text-sm text-white/70">
-                {c.responsibilities.map((r, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
-                    <span>{r}</span>
+        {/* Body */}
+        <div className="max-h-[50vh] overflow-y-auto p-6 sm:p-8">
+          {committee.responsibilities?.length ? (
+            <>
+              <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-feu-green">
+                <Sparkles className="h-4 w-4" /> Main Responsibilities
+              </h4>
+              <ul className="mt-4 space-y-4">
+                {committee.responsibilities.map((r, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-feu-green/10 text-xs font-black text-feu-green">
+                      {i + 1}
+                    </span>
+                    <span className="text-[0.95rem] leading-relaxed text-slate-700">
+                      {r}
+                    </span>
                   </li>
                 ))}
               </ul>
-            </div>
-          ) : null}
+            </>
+          ) : (
+            <p className="text-sm text-slate-500">
+              Details for this committee are being finalized.
+            </p>
+          )}
+        </div>
 
-          {interactive && (
-            <div className="mt-4 flex items-center justify-end gap-1 text-xs font-semibold text-gold/70">
+        {/* Footer — choose-this action when the form is open */}
+        {onChoose && (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-cloud px-6 py-4 sm:px-8">
+            <p className="text-xs text-slate-500">
+              {isSelected
+                ? "This is your current 1st choice."
+                : "Ready to apply? Set this as your 1st choice."}
+            </p>
+            <button
+              type="button"
+              onClick={() => onChoose(committee.name)}
+              className={
+                isSelected
+                  ? "btn-green px-5 py-2.5 text-sm"
+                  : "btn-gold px-5 py-2.5 text-sm"
+              }
+            >
               {isSelected ? (
                 <>
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  Selected as 1st choice
+                  <CheckCircle2 className="h-4 w-4" />
+                  Selected — go to form
                 </>
               ) : (
                 <>
-                  Choose this committee
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  <ArrowRight className="h-4 w-4" />
+                  Choose as 1st choice
                 </>
               )}
-            </div>
-          )}
-          </Wrapper>
-        );
-      })}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -741,22 +861,23 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
 
 // ============================================================================
 export default function Apply() {
-  // Committee-choice state lives here so that both the CommitteesGrid (clicks)
-  // and the ApplicationForm (dropdowns) can read + update it.
+  // Committee-choice state lives here so both the detail modal ("Choose as 1st
+  // choice" button) and the ApplicationForm (dropdowns) can read + update it.
   const [first, setFirst] = useState(
     APPLICATIONS_OPEN ? committees[0]?.name || "" : ""
   );
   const [second, setSecond] = useState("");
   const [third, setThird] = useState("");
+  // Committee currently open in the detail modal (null when closed).
+  const [openedCommittee, setOpenedCommittee] = useState(null);
 
-  // Clicking a committee card selects it as 1st choice and scrolls the form
-  // into view so the applicant sees their pick reflected immediately.
-  const handleCommitteeSelect = (name) => {
+  // Called from inside the detail modal: sets the committee as 1st choice,
+  // closes the modal, and smoothly scrolls the form into view.
+  const handleChooseCommittee = (name) => {
     setFirst(name);
-    // Bump the other slots if they'd collide with the new 1st choice.
     if (second === name) setSecond("");
     if (third === name) setThird("");
-    // Delay so React re-renders the form first, then scroll.
+    setOpenedCommittee(null);
     setTimeout(() => {
       const target = document.getElementById("ap-form");
       if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -831,10 +952,7 @@ export default function Apply() {
             <Users className="h-5 w-5 text-gold" />
             <h3 className="text-xl font-black">What you can join</h3>
           </div>
-          <CommitteesGrid
-            onSelect={APPLICATIONS_OPEN ? handleCommitteeSelect : undefined}
-            selected={first}
-          />
+          <CommitteesGrid onOpen={setOpenedCommittee} selected={first} />
         </div>
 
         {/* --- Form area --- */}
@@ -890,6 +1008,14 @@ export default function Apply() {
           <FaqList />
         </div>
       </div>
+
+      {/* Committee detail modal — opens from any committee card click */}
+      <CommitteeDetailModal
+        committee={openedCommittee}
+        onClose={() => setOpenedCommittee(null)}
+        onChoose={APPLICATIONS_OPEN ? handleChooseCommittee : null}
+        selected={first}
+      />
     </section>
   );
 }
