@@ -7,9 +7,9 @@
 //  QUICK CHECKLIST — items marked ⚠️ TODO need your real data before launch.
 // =============================================================================
 
-// ⚠️ TODO: flip to true on Aug 19, 2026 when Batch 1 applications go live.
-// (After Batch 1 closes Aug 23, flip false again until Batch 2 opens Sept 24.)
-export const APPLICATIONS_OPEN = false;
+// LIVE — Batch 1 applications are open (Aug 19 – 23, 2026).
+// After Batch 1 closes Aug 23, flip false again until Batch 2 opens Sept 24.
+export const APPLICATIONS_OPEN = true;
 
 // Real dates are set — countdown is live and ticks to opensAt / closesAt below.
 export const SHOW_COUNTDOWN = true;
