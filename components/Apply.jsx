@@ -31,7 +31,10 @@ import {
   FAQ,
 } from "@/data/committees";
 import Countdown from "./Countdown";
-import { uploadApplicationPdf } from "@/lib/supabase";
+import {
+  uploadApplicationPdf,
+  insertCommitteeApplication,
+} from "@/lib/supabase";
 
 const MAX_FILE_MB = 5;
 const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
@@ -391,6 +394,30 @@ function ApplicationForm() {
     }
 
     setStatus("submitting");
+
+    // Insert into Supabase Postgres for structured storage / ASCC review.
+    // Fails soft — if Supabase hiccups, the applicant still succeeds via
+    // Forminit (email notification + dashboard), and we log the mismatch.
+    try {
+      await insertCommitteeApplication({
+        name: fd.get("fi-sender-fullName"),
+        email: fd.get("fi-sender-email"),
+        program: fd.get("fi-text-program"),
+        year_level: fd.get("fi-text-year"),
+        contact_number: fd.get("fi-text-contact") || null,
+        first_choice: first,
+        second_choice: second || null,
+        third_choice: third || null,
+        preferred_role: fd.get("fi-select-preferredRole") || null,
+        motivation: fd.get("fi-text-motivation"),
+        past_experience: fd.get("fi-text-experience") || null,
+        resume_url: fd.get("fi-text-resumeUrl") || null,
+      });
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn("Supabase committee_applications insert failed:", err);
+    }
+
     try {
       const res = await fetch(FORMINIT_ENDPOINT, {
         method: "POST",
