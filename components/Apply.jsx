@@ -78,18 +78,43 @@ function TimelineStrip() {
 }
 
 // ---------- Committee cards ----------
-function CommitteesGrid() {
+// When onSelect is provided, each card becomes an interactive button that
+// picks that committee as the applicant's 1st choice and scrolls the form
+// into view. The currently-selected committee shows a "1st choice" badge.
+function CommitteesGrid({ onSelect, selected }) {
   if (!committees.length) return null;
+  const interactive = typeof onSelect === "function";
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-      {committees.map((c) => (
-        <article
-          key={c.name}
-          className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm transition hover:border-gold/40 hover:bg-white/[0.08]"
-        >
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-gold" />
-            <h4 className="text-lg font-black">{c.name}</h4>
+      {committees.map((c) => {
+        const isSelected = interactive && selected === c.name;
+        const cardClass = `rounded-2xl border p-6 backdrop-blur-sm transition ${
+          isSelected
+            ? "border-gold bg-gold/10 shadow-gold ring-1 ring-gold/40"
+            : "border-white/10 bg-white/[0.04] hover:border-gold/40 hover:bg-white/[0.08]"
+        } ${interactive ? "cursor-pointer text-left" : ""}`;
+        const commonProps = interactive
+          ? {
+              type: "button",
+              onClick: () => onSelect(c.name),
+              "aria-pressed": isSelected,
+              className: `${cardClass} w-full`,
+            }
+          : { className: cardClass };
+        const Wrapper = interactive ? "button" : "article";
+        return (
+          <Wrapper key={c.name} {...commonProps}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-gold" />
+              <h4 className="text-lg font-black">{c.name}</h4>
+            </div>
+            {isSelected && (
+              <span className="pill bg-gold text-feu-moss">
+                <CheckCircle2 className="h-3 w-3" />
+                1st choice
+              </span>
+            )}
           </div>
           {c.description ? (
             <p className="mt-2 text-sm leading-relaxed text-white/70">
@@ -129,8 +154,25 @@ function CommitteesGrid() {
               </ul>
             </div>
           ) : null}
-        </article>
-      ))}
+
+          {interactive && (
+            <div className="mt-4 flex items-center justify-end gap-1 text-xs font-semibold text-gold/70">
+              {isSelected ? (
+                <>
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Selected as 1st choice
+                </>
+              ) : (
+                <>
+                  Choose this committee
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </>
+              )}
+            </div>
+          )}
+          </Wrapper>
+        );
+      })}
     </div>
   );
 }
@@ -308,12 +350,12 @@ function NotifyMeForm() {
 }
 
 // ---------- Full application form (open state) ----------
-function ApplicationForm() {
+// The 1st/2nd/3rd choice state is owned by the parent Apply component so that
+// the CommitteesGrid can also drive it — clicking a committee card selects it
+// as the applicant's 1st choice.
+function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }) {
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
-  const [first, setFirst] = useState(committees[0]?.name || "");
-  const [second, setSecond] = useState("");
-  const [third, setThird] = useState("");
   // Attached PDF (optional). `file` is the File object; `fileError` holds a
   // local validation message so we don't reject the whole form for a bad file.
   const [file, setFile] = useState(null);
@@ -454,8 +496,9 @@ function ApplicationForm() {
 
   return (
     <form
+      id="ap-form"
       onSubmit={handleSubmit}
-      className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm sm:p-8"
+      className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm sm:p-8 scroll-mt-24"
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
@@ -698,6 +741,28 @@ function ApplicationForm() {
 
 // ============================================================================
 export default function Apply() {
+  // Committee-choice state lives here so that both the CommitteesGrid (clicks)
+  // and the ApplicationForm (dropdowns) can read + update it.
+  const [first, setFirst] = useState(
+    APPLICATIONS_OPEN ? committees[0]?.name || "" : ""
+  );
+  const [second, setSecond] = useState("");
+  const [third, setThird] = useState("");
+
+  // Clicking a committee card selects it as 1st choice and scrolls the form
+  // into view so the applicant sees their pick reflected immediately.
+  const handleCommitteeSelect = (name) => {
+    setFirst(name);
+    // Bump the other slots if they'd collide with the new 1st choice.
+    if (second === name) setSecond("");
+    if (third === name) setThird("");
+    // Delay so React re-renders the form first, then scroll.
+    setTimeout(() => {
+      const target = document.getElementById("ap-form");
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
+
   return (
     <section id="apply" className="relative overflow-hidden bg-feu-moss py-24 text-white">
       <div
@@ -766,7 +831,10 @@ export default function Apply() {
             <Users className="h-5 w-5 text-gold" />
             <h3 className="text-xl font-black">What you can join</h3>
           </div>
-          <CommitteesGrid />
+          <CommitteesGrid
+            onSelect={APPLICATIONS_OPEN ? handleCommitteeSelect : undefined}
+            selected={first}
+          />
         </div>
 
         {/* --- Form area --- */}
@@ -796,7 +864,14 @@ export default function Apply() {
                 Every field is reviewed. Take your time — this is your pitch.
               </div>
               {committees.length > 0 ? (
-                <ApplicationForm />
+                <ApplicationForm
+                  first={first}
+                  setFirst={setFirst}
+                  second={second}
+                  setSecond={setSecond}
+                  third={third}
+                  setThird={setThird}
+                />
               ) : (
                 <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 text-center text-sm text-white/70">
                   Committee list is being finalized. Please check back soon.
