@@ -1003,6 +1003,13 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
               disabled={submitting}
               className="hidden"
             />
+            <p className="mt-2 text-xs text-gold/80">
+              Filename:{" "}
+              <span className="font-mono font-semibold">
+                OIS_Surname and Name
+              </span>{" "}
+              (e.g. <span className="font-mono">OIS_Dela Cruz Juan</span>)
+            </p>
             {fileError && (
               <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-300">
                 <AlertCircle className="h-3.5 w-3.5" />
@@ -1274,6 +1281,12 @@ export default function Apply() {
                   Download this Word file, fill out all your details, save it as
                   a PDF, and upload it in the application form&apos;s attachment
                   field.
+                </p>
+                <p className="mt-2 max-w-xl text-xs font-semibold text-gold">
+                  ⚠ Save your PDF as{" "}
+                  <span className="font-mono">OIS_Surname and Name</span>{" "}
+                  (e.g. <span className="font-mono">OIS_Dela Cruz Juan</span>)
+                  before uploading.
                 </p>
               </div>
             </div>

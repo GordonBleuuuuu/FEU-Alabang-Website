@@ -275,7 +275,7 @@ export const FAQ = [
   },
   {
     q: "What documents do I need to attach?",
-    a: "Two files are required: (1) the Officer Information Sheet — download it from the Required Document section above, fill it out, and save it as a PDF; and (2) a photo or scan of your valid School ID. Both are uploaded in the application form's attachment section.",
+    a: "Two files are required: (1) the Officer Information Sheet — download it from the Required Document section above, fill it out, and save it as a PDF named OIS_Surname and Name (e.g. OIS_Dela Cruz Juan); and (2) a photo or scan of your valid School ID. Both are uploaded in the application form's attachment section.",
   },
   {
     q: "When will I hear back?",
