@@ -7,12 +7,7 @@ import {
 } from "lucide-react";
 import Logo from "./Logo";
 import HeroSlideshow from "./HeroSlideshow";
-
-const STATS = [
-  { value: "2021", label: "Established" },
-  { value: "6", label: "Leadership Batches" },
-  { value: "13+", label: "Annual Programs" },
-];
+import HeroStats from "./HeroStats";
 
 export default function Hero() {
   return (
@@ -74,22 +69,8 @@ export default function Hero() {
             </a>
           </div>
 
-          {/* Stats */}
-          <dl className="mt-12 grid max-w-lg grid-cols-3 gap-4">
-            {STATS.map((s) => (
-              <div
-                key={s.label}
-                className="glass rounded-2xl px-4 py-4 text-center"
-              >
-                <dt className="text-2xl font-black text-gold sm:text-3xl">
-                  {s.value}
-                </dt>
-                <dd className="mt-1 text-[0.7rem] font-medium uppercase tracking-wide text-white/70">
-                  {s.label}
-                </dd>
-              </div>
-            ))}
-          </dl>
+          {/* Stats — animated counter (client component) */}
+          <HeroStats />
         </div>
 
         {/* Visual */}
