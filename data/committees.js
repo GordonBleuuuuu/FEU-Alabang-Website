@@ -203,7 +203,7 @@ export const committees = [
       "Has strong organizational, communication, and management skills.",
     ],
     responsibilities: [
-      "Leads one of the 9 director portfolios listed below.",
+      "Leads one of the 10 director portfolios listed below.",
       "Reports progress, blockers, and outcomes directly to the executive board.",
       "Represents the SCC in cross-committee planning and external coordination.",
     ],
@@ -215,6 +215,7 @@ export const committees = [
       { name: "Documentation Director", description: "Heads SCC event and initiative documentation." },
       { name: "Logistics Director", description: "Heads Logistics and event operations." },
       { name: "Publicity Director", description: "Heads Publicity strategy and campaigns." },
+      { name: "Marketing Director", description: "Heads Marketing strategy, brand, and outreach campaigns." },
       { name: "Programs Director", description: "Heads Programs planning and execution." },
       { name: "Finance Director", description: "Heads Finance operations and reporting." },
       { name: "Secretariat Director", description: "Heads the Secretariat team." },
