@@ -693,10 +693,22 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
         fd.set("fi-text-schoolIdUrl", publicUrl);
       }
     } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("File upload error:", err);
       setStatus("error");
-      setError(
-        "Couldn't upload your attachment. Please try again, or submit without it."
-      );
+      // Show the real cause when we can — Supabase Storage errors are the
+      // usual culprit (mime-type restriction, file-size cap, or RLS policy).
+      const raw = err?.message || err?.error || "Unknown error";
+      const friendly = /mime|type/i.test(raw)
+        ? "This file type isn't accepted. Please use PDF for the OIS and PDF/JPG/PNG for the School ID."
+        : /size|too large|exceeds/i.test(raw)
+        ? `File is too large. Max ${MAX_FILE_MB} MB.`
+        : /policy|permission|denied|unauthorized/i.test(raw)
+        ? "Upload was rejected by the server. Please try again in a moment."
+        : /network|failed to fetch|timeout/i.test(raw)
+        ? "Network hiccup — please try again in a moment."
+        : `Couldn't upload your attachment. (${raw})`;
+      setError(friendly);
       return;
     }
 
