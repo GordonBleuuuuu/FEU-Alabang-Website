@@ -67,9 +67,13 @@ export const TIMELINE = [
 ];
 
 // -----------------------------------------------------------------------------
-// COMMITTEES — ⚠️ TODO: replace with your real committees and roles.
-// Each committee shows on the Apply section as a card. `hoursPerWeek` and
-// `meetingCadence` power the "expectations" line so applicants self-select.
+// COMMITTEES & LEADERSHIP POSITIONS
+// Each entry appears as a card in the Apply section and as an option in the
+// 1st/2nd/3rd choice dropdowns. `type` groups them visually so committees
+// stay separate from leadership positions (Directors, Course Reps).
+//   type: "committee"  → grouped under "Committees"
+//   type: "leadership" → grouped under "Leadership Positions"
+// (Defaults to "committee" if omitted.)
 // -----------------------------------------------------------------------------
 export const committees = [
   {
@@ -176,6 +180,7 @@ export const committees = [
     ],
   },
   {
+    type: "leadership",
     name: "Board of Directors",
     description:
       "Senior leadership seats that head each SCC portfolio and steer strategy across committees.",
@@ -199,6 +204,7 @@ export const committees = [
     ],
   },
   {
+    type: "leadership",
     name: "Course Representative",
     description:
       "Represents your degree program inside the SCC general assembly and bridges the council with your program's students.",

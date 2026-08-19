@@ -81,79 +81,125 @@ function TimelineStrip() {
 }
 
 // ---------- Committee cards ----------
-// Each card is a clickable button that opens the CommitteeDetailModal below,
-// letting applicants see the full responsibilities list in a spacious layout.
-// The currently-selected 1st choice keeps a subtle gold border so it stands out.
+// Renders two clearly-labeled groups so applicants don't confuse committee
+// membership (regular applications) with leadership seats (Directors,
+// Course Reps). Each card opens the CommitteeDetailModal.
+function CommitteeCard({ c, isSelected, onOpen }) {
+  const cardClass = `group w-full rounded-2xl border p-6 text-left backdrop-blur-sm transition ${
+    isSelected
+      ? "border-gold bg-gold/10 shadow-gold ring-1 ring-gold/40"
+      : "border-white/10 bg-white/[0.04] hover:-translate-y-0.5 hover:border-gold/40 hover:bg-white/[0.08]"
+  } cursor-pointer`;
+  return (
+    <button type="button" onClick={() => onOpen(c)} className={cardClass}>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-gold" />
+          <h4 className="text-lg font-black">{c.name}</h4>
+        </div>
+        {isSelected && (
+          <span className="pill bg-gold text-feu-moss">
+            <CheckCircle2 className="h-3 w-3" />
+            1st choice
+          </span>
+        )}
+      </div>
+
+      {c.description ? (
+        <p className="mt-2 text-sm leading-relaxed text-white/70">
+          {c.description}
+        </p>
+      ) : null}
+
+      {(c.hoursPerWeek || c.meetingCadence) && (
+        <div className="mt-4 flex flex-wrap gap-2 text-xs">
+          {c.hoursPerWeek && (
+            <span className="pill bg-white/5 text-white/80 ring-1 ring-white/10">
+              <Clock className="h-3 w-3" />
+              {c.hoursPerWeek} / week
+            </span>
+          )}
+          {c.meetingCadence && (
+            <span className="pill bg-white/5 text-white/80 ring-1 ring-white/10">
+              <CalendarDays className="h-3 w-3" />
+              {c.meetingCadence}
+            </span>
+          )}
+        </div>
+      )}
+
+      {c.responsibilities?.length ? (
+        <p className="mt-4 border-t border-white/10 pt-4 text-xs text-white/60">
+          <span className="font-semibold uppercase tracking-wider text-gold">
+            {c.responsibilities.length} responsibilities
+          </span>{" "}
+          — tap to view details
+        </p>
+      ) : null}
+
+      <div className="mt-3 flex items-center justify-end gap-1 text-xs font-semibold text-gold/80 transition group-hover:text-gold">
+        View details
+        <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+      </div>
+    </button>
+  );
+}
+
 function CommitteesGrid({ onOpen, selected }) {
   if (!committees.length) return null;
+
+  const committeeItems = committees.filter(
+    (c) => (c.type || "committee") === "committee"
+  );
+  const leadershipItems = committees.filter((c) => c.type === "leadership");
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-      {committees.map((c) => {
-        const isSelected = selected === c.name;
-        const cardClass = `group w-full rounded-2xl border p-6 text-left backdrop-blur-sm transition ${
-          isSelected
-            ? "border-gold bg-gold/10 shadow-gold ring-1 ring-gold/40"
-            : "border-white/10 bg-white/[0.04] hover:-translate-y-0.5 hover:border-gold/40 hover:bg-white/[0.08]"
-        } cursor-pointer`;
-        return (
-          <button
-            key={c.name}
-            type="button"
-            onClick={() => onOpen(c)}
-            className={cardClass}
-          >
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-gold" />
-                <h4 className="text-lg font-black">{c.name}</h4>
-              </div>
-              {isSelected && (
-                <span className="pill bg-gold text-feu-moss">
-                  <CheckCircle2 className="h-3 w-3" />
-                  1st choice
-                </span>
-              )}
-            </div>
+    <div className="space-y-10">
+      {committeeItems.length > 0 && (
+        <div>
+          <div className="mb-4 flex items-center gap-2">
+            <span className="pill bg-white/10 text-gold ring-1 ring-white/15">
+              Committees
+            </span>
+            <span className="text-xs text-white/50">
+              Join a team that powers SCC events and operations
+            </span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+            {committeeItems.map((c) => (
+              <CommitteeCard
+                key={c.name}
+                c={c}
+                isSelected={selected === c.name}
+                onOpen={onOpen}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
-            {c.description ? (
-              <p className="mt-2 text-sm leading-relaxed text-white/70">
-                {c.description}
-              </p>
-            ) : null}
-
-            {(c.hoursPerWeek || c.meetingCadence) && (
-              <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                {c.hoursPerWeek && (
-                  <span className="pill bg-white/5 text-white/80 ring-1 ring-white/10">
-                    <Clock className="h-3 w-3" />
-                    {c.hoursPerWeek} / week
-                  </span>
-                )}
-                {c.meetingCadence && (
-                  <span className="pill bg-white/5 text-white/80 ring-1 ring-white/10">
-                    <CalendarDays className="h-3 w-3" />
-                    {c.meetingCadence}
-                  </span>
-                )}
-              </div>
-            )}
-
-            {c.responsibilities?.length ? (
-              <p className="mt-4 border-t border-white/10 pt-4 text-xs text-white/60">
-                <span className="font-semibold uppercase tracking-wider text-gold">
-                  {c.responsibilities.length} responsibilities
-                </span>{" "}
-                — tap to view details
-              </p>
-            ) : null}
-
-            <div className="mt-3 flex items-center justify-end gap-1 text-xs font-semibold text-gold/80 transition group-hover:text-gold">
-              View details
-              <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
-            </div>
-          </button>
-        );
-      })}
+      {leadershipItems.length > 0 && (
+        <div>
+          <div className="mb-4 flex items-center gap-2">
+            <span className="pill bg-gold/15 text-gold ring-1 ring-gold/30">
+              Leadership Positions
+            </span>
+            <span className="text-xs text-white/50">
+              Senior seats — Directors and Course Representatives
+            </span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+            {leadershipItems.map((c) => (
+              <CommitteeCard
+                key={c.name}
+                c={c}
+                isSelected={selected === c.name}
+                onOpen={onOpen}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -694,6 +740,48 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
   const optionsExcluding = (exclude) =>
     committees.filter((c) => !exclude.includes(c.name));
 
+  // Render options grouped into Committees + Leadership Positions using
+  // <optgroup> so the two sets stay visually separated in the dropdown too.
+  const renderGroupedOptions = (list) => {
+    const committeeItems = list.filter(
+      (c) => (c.type || "committee") === "committee"
+    );
+    const leadershipItems = list.filter((c) => c.type === "leadership");
+    return (
+      <>
+        {committeeItems.length > 0 && (
+          <optgroup label="Committees" className="bg-feu-green text-white">
+            {committeeItems.map((c) => (
+              <option
+                key={c.name}
+                value={c.name}
+                className="bg-feu-green text-white"
+              >
+                {c.name}
+              </option>
+            ))}
+          </optgroup>
+        )}
+        {leadershipItems.length > 0 && (
+          <optgroup
+            label="Leadership Positions"
+            className="bg-feu-green text-white"
+          >
+            {leadershipItems.map((c) => (
+              <option
+                key={c.name}
+                value={c.name}
+                className="bg-feu-green text-white"
+              >
+                {c.name}
+              </option>
+            ))}
+          </optgroup>
+        )}
+      </>
+    );
+  };
+
   return (
     <form
       id="ap-form"
@@ -726,11 +814,11 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
           <input id="ap-year" name="fi-text-year" type="text" required disabled={submitting} placeholder="e.g. 3rd year" className={inputClass} />
         </div>
 
-        {/* Ranked committee choices */}
+        {/* Ranked choices — committees OR leadership positions */}
         <div className="sm:col-span-2 rounded-2xl border border-gold/25 bg-gold/5 p-4">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-gold">
             <Repeat className="h-4 w-4" />
-            Rank your committee choices
+            Rank your choices
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             <div>
@@ -750,11 +838,7 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
                 disabled={submitting}
                 className={inputClass}
               >
-                {committees.map((c) => (
-                  <option key={c.name} value={c.name} className="bg-feu-green text-white">
-                    {c.name}
-                  </option>
-                ))}
+                {renderGroupedOptions(committees)}
               </select>
             </div>
             <div>
@@ -773,11 +857,7 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
                 className={inputClass}
               >
                 <option value="" className="bg-feu-green text-white">— None —</option>
-                {optionsExcluding([first]).map((c) => (
-                  <option key={c.name} value={c.name} className="bg-feu-green text-white">
-                    {c.name}
-                  </option>
-                ))}
+                {renderGroupedOptions(optionsExcluding([first]))}
               </select>
             </div>
             <div>
@@ -793,11 +873,7 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
                 className={inputClass}
               >
                 <option value="" className="bg-feu-green text-white">— None —</option>
-                {optionsExcluding([first, second]).map((c) => (
-                  <option key={c.name} value={c.name} className="bg-feu-green text-white">
-                    {c.name}
-                  </option>
-                ))}
+                {renderGroupedOptions(optionsExcluding([first, second]))}
               </select>
             </div>
           </div>
