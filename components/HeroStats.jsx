@@ -1,23 +1,24 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import anime from "animejs";
 
 // Each stat has a target integer (`to`) and any non-numeric decoration that
 // should render alongside the animated number — a `+` suffix on "13+", etc.
 const STATS = [
-  { to: 2021, label: "Established", suffix: "", format: "year" },
-  { to: 6, label: "Leadership Batches", suffix: "", format: "int" },
-  { to: 13, label: "Annual Programs", suffix: "+", format: "int" },
+  { to: 2021, from: 2000, label: "Established", suffix: "" },
+  { to: 6, from: 0, label: "Leadership Batches", suffix: "" },
+  { to: 13, from: 0, label: "Annual Programs", suffix: "+" },
 ];
+
+// easeOutExpo — fast burst, gentle settle, matches the animation's original feel.
+const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
 export default function HeroStats() {
   const containerRef = useRef(null);
-  const [values, setValues] = useState(STATS.map(() => 0));
+  const [values, setValues] = useState(STATS.map((s) => s.from));
   const startedRef = useRef(false);
+  const rafsRef = useRef([]);
 
-  // Trigger the count-up when the stats scroll into view — feels natural on
-  // desktop too because the hero mounts already visible.
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -27,38 +28,37 @@ export default function HeroStats() {
       startedRef.current = true;
 
       // Respect users who prefer reduced motion — snap to final values.
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)")
+        .matches;
       if (reduce) {
         setValues(STATS.map((s) => s.to));
         return;
       }
 
-      // Animate each counter independently. The `year` stat starts from a
-      // sensible baseline (2000) rather than 0 so it doesn't visually tick
-      // through millennia — feels faster + cleaner.
+      // Fire each counter as its own rAF loop, with a small stagger.
       STATS.forEach((s, i) => {
-        const from = s.format === "year" ? 2000 : 0;
-        const holder = { n: from };
-        setValues((prev) => {
-          const next = [...prev];
-          next[i] = from;
-          return next;
-        });
-        anime({
-          targets: holder,
-          n: s.to,
-          round: 1,
-          duration: 1600 + i * 150,
-          delay: i * 100,
-          easing: "easeOutExpo",
-          update: () => {
-            setValues((prev) => {
-              const next = [...prev];
-              next[i] = holder.n;
-              return next;
-            });
-          },
-        });
+        const duration = 1600 + i * 150;
+        const delay = i * 100;
+        const startAt = performance.now() + delay;
+
+        const tick = (now) => {
+          const elapsed = now - startAt;
+          if (elapsed < 0) {
+            rafsRef.current[i] = requestAnimationFrame(tick);
+            return;
+          }
+          const t = Math.min(1, elapsed / duration);
+          const eased = easeOutExpo(t);
+          const value = Math.round(s.from + (s.to - s.from) * eased);
+          setValues((prev) => {
+            if (prev[i] === value) return prev; // avoid needless re-renders
+            const next = [...prev];
+            next[i] = value;
+            return next;
+          });
+          if (t < 1) rafsRef.current[i] = requestAnimationFrame(tick);
+        };
+        rafsRef.current[i] = requestAnimationFrame(tick);
       });
     };
 
@@ -67,14 +67,26 @@ export default function HeroStats() {
       { threshold: 0.4 }
     );
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Also kick off after a short delay in case the section is already in view
+    // on mount (hero is above the fold, IntersectionObserver may already have
+    // fired by mount time on some browsers).
+    const kick = setTimeout(() => {
+      const rect = el.getBoundingClientRect();
+      const visible =
+        rect.top < window.innerHeight * 0.9 && rect.bottom > 0;
+      if (visible) start();
+    }, 200);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(kick);
+      rafsRef.current.forEach((id) => id && cancelAnimationFrame(id));
+    };
   }, []);
 
   return (
-    <dl
-      ref={containerRef}
-      className="mt-12 grid max-w-lg grid-cols-3 gap-4"
-    >
+    <dl ref={containerRef} className="mt-12 grid max-w-lg grid-cols-3 gap-4">
       {STATS.map((s, i) => (
         <div
           key={s.label}
