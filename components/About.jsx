@@ -1,4 +1,5 @@
 import { Target, Eye, Quote, Camera, History, Milestone } from "lucide-react";
+import Clock from "./Clock";
 
 // Gallery tiles. Add `src: "/gallery/file.jpg"` to any tile to show a real
 // photo; tiles without `src` render the gradient placeholder (tone).
@@ -77,6 +78,11 @@ export default function About() {
             <h3 className="mt-3 text-2xl font-black tracking-tight text-ink sm:text-3xl">
               Empowered, united, and brave from the start
             </h3>
+          </div>
+
+          {/* Aesthetic SCC clock — symbolizes the SCC's ongoing journey */}
+          <div className="mt-10 flex justify-center">
+            <Clock />
           </div>
 
           <div className="mx-auto mt-10 max-w-4xl">
