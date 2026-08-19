@@ -176,33 +176,50 @@ export const committees = [
     ],
   },
   {
-    // ⚠️ TODO: replace the description + responsibilities with the official
-    // Director role write-up when ready. Placeholder copy for now.
-    name: "Director",
+    name: "Board of Directors",
     description:
-      "Heads a portfolio of SCC initiatives and coordinates directly with committees on delivery.",
+      "Senior leadership seats that head each SCC portfolio and steer strategy across committees.",
     responsibilities: [
-      "Oversees one or more committees or flagship initiatives under the SCC.",
-      "Reports progress, blockers, and outcomes to the executive board.",
+      "Leads one of the 9 director portfolios listed below.",
+      "Reports progress, blockers, and outcomes directly to the executive board.",
       "Represents the SCC in cross-committee planning and external coordination.",
     ],
+    // After picking Board of Directors as 1st choice, the Preferred Role
+    // dropdown appears with the 9 specific director seats.
     roles: [
-      { name: "Director", description: "Steps into a senior leadership seat, driving strategy across committees." },
+      { name: "Creatives Director", description: "Heads the Creatives team and its output." },
+      { name: "Technicals Director", description: "Heads the Technicals team and event production." },
+      { name: "Documentation Director", description: "Heads SCC event and initiative documentation." },
+      { name: "Logistics Director", description: "Heads Logistics and event operations." },
+      { name: "Publicity Director", description: "Heads Publicity strategy and campaigns." },
+      { name: "Programs Director", description: "Heads Programs planning and execution." },
+      { name: "Finance Director", description: "Heads Finance operations and reporting." },
+      { name: "Secretariat Director", description: "Heads the Secretariat team." },
+      { name: "Communication Director", description: "Heads external Communications and linkages." },
     ],
   },
   {
-    // ⚠️ TODO: replace the description + responsibilities with the official
-    // Course Representative role write-up when ready. Placeholder copy for now.
     name: "Course Representative",
     description:
-      "Represents your degree program and year level inside the SCC general assembly.",
+      "Represents your degree program inside the SCC general assembly and bridges the council with your program's students.",
     responsibilities: [
-      "Voices the concerns, ideas, and feedback of your course and year level.",
+      "Voices the concerns, ideas, and feedback of your degree program.",
       "Attends SCC general assemblies and relays SCC updates back to your classmates.",
-      "Bridges the SCC with your program's student community.",
+      "Serves as the primary point of contact between the SCC and your program's student community.",
     ],
+    // After picking Course Representative as 1st choice, the Preferred Role
+    // dropdown appears with the specific degree-program seats.
     roles: [
-      { name: "Course Representative", description: "Serves as the elected voice of your course and year level within the SCC." },
+      { name: "Computer Science Representative", description: "Represents BS Computer Science." },
+      { name: "Electrical Engineering Representative", description: "Represents BS Electrical Engineering." },
+      { name: "Electronics Engineering Representative", description: "Represents BS Electronics Engineering." },
+      { name: "Computer Engineering Representative", description: "Represents BS Computer Engineering." },
+      { name: "Civil Engineering Representative", description: "Represents BS Civil Engineering." },
+      { name: "Mechanical Engineering Representative", description: "Represents BS Mechanical Engineering." },
+      { name: "Information Technology Representative", description: "Represents BS Information Technology." },
+      { name: "Business Administration Representative", description: "Represents BS Business Administration." },
+      { name: "Psychology Representative", description: "Represents BS Psychology." },
+      { name: "Tourism Management Representative", description: "Represents BS Tourism Management." },
     ],
   },
 ];

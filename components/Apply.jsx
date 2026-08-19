@@ -806,7 +806,11 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
         {firstCommittee?.roles && firstCommittee.roles.length > 1 && (
           <div>
             <label htmlFor="ap-role" className="mb-1.5 block text-sm font-medium text-white/85">
-              Preferred role in your 1st choice
+              {first === "Board of Directors"
+                ? "Which director seat are you applying for?"
+                : first === "Course Representative"
+                ? "Which degree program do you represent?"
+                : "Preferred role in your 1st choice"}
             </label>
             <select
               id="ap-role"
