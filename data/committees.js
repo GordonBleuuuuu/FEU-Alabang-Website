@@ -116,6 +116,19 @@ export const committees = [
     ],
   },
   {
+    name: "Documentation Committee",
+    description:
+      "Captures every SCC event and manages the photos, reports, and records that live on after.",
+    responsibilities: [
+      "Assists in documenting organizational activities and events.",
+      "Manages all necessary documents for events — photos, reports, records, and other important files.",
+      "Ensures all documents are accomplished properly and delivered on time.",
+    ],
+    roles: [
+      { name: "Member", description: "Joins the Documentation team to capture SCC events and keep the records complete and timely." },
+    ],
+  },
+  {
     name: "Finance Committee",
     description:
       "Guards the SCC's funds and keeps every peso transparent, tracked, and accounted for.",
