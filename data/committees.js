@@ -240,16 +240,14 @@ export const committees = [
     // After picking Course Representative as 1st choice, the Preferred Role
     // dropdown appears with the specific degree-program seats.
     roles: [
-      { name: "Computer Science Representative", description: "Represents BS Computer Science." },
       { name: "Electrical Engineering Representative", description: "Represents BS Electrical Engineering." },
       { name: "Electronics Engineering Representative", description: "Represents BS Electronics Engineering." },
       { name: "Computer Engineering Representative", description: "Represents BS Computer Engineering." },
-      { name: "Civil Engineering Representative", description: "Represents BS Civil Engineering." },
       { name: "Mechanical Engineering Representative", description: "Represents BS Mechanical Engineering." },
-      { name: "Information Technology Representative", description: "Represents BS Information Technology." },
       { name: "Business Administration Representative", description: "Represents BS Business Administration." },
       { name: "Psychology Representative", description: "Represents BS Psychology." },
       { name: "Tourism Management Representative", description: "Represents BS Tourism Management." },
+      { name: "Multimedia Arts Representative", description: "Represents BA Multimedia Arts." },
     ],
   },
 ];
