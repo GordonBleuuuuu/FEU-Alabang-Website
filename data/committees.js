@@ -213,6 +213,11 @@ export const committees = [
     name: "Course Representative",
     description:
       "Represents your degree program inside the SCC general assembly and bridges the council with your program's students.",
+    requirements: [
+      "Must have at least 1 year of experience in an executive role in an RSO.",
+      "Must demonstrate leadership and active participation in representing their course.",
+      "Must showcase strong communication skills in representing the interests and concerns of the represented course.",
+    ],
     responsibilities: [
       "Voices the concerns, ideas, and feedback of your degree program.",
       "Attends SCC general assemblies and relays SCC updates back to your classmates.",
