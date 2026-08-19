@@ -175,6 +175,36 @@ export const committees = [
       { name: "Member", description: "Joins the Communications team to build external partnerships and represent SCC in inter-org linkages." },
     ],
   },
+  {
+    // ⚠️ TODO: replace the description + responsibilities with the official
+    // Director role write-up when ready. Placeholder copy for now.
+    name: "Director",
+    description:
+      "Heads a portfolio of SCC initiatives and coordinates directly with committees on delivery.",
+    responsibilities: [
+      "Oversees one or more committees or flagship initiatives under the SCC.",
+      "Reports progress, blockers, and outcomes to the executive board.",
+      "Represents the SCC in cross-committee planning and external coordination.",
+    ],
+    roles: [
+      { name: "Director", description: "Steps into a senior leadership seat, driving strategy across committees." },
+    ],
+  },
+  {
+    // ⚠️ TODO: replace the description + responsibilities with the official
+    // Course Representative role write-up when ready. Placeholder copy for now.
+    name: "Course Representative",
+    description:
+      "Represents your degree program and year level inside the SCC general assembly.",
+    responsibilities: [
+      "Voices the concerns, ideas, and feedback of your course and year level.",
+      "Attends SCC general assemblies and relays SCC updates back to your classmates.",
+      "Bridges the SCC with your program's student community.",
+    ],
+    roles: [
+      { name: "Course Representative", description: "Serves as the elected voice of your course and year level within the SCC." },
+    ],
+  },
 ];
 
 // -----------------------------------------------------------------------------
