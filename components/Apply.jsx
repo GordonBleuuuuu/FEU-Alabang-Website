@@ -576,6 +576,21 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
       );
       return;
     }
+    // Required attachments guard.
+    if (!file) {
+      setStatus("error");
+      setError(
+        "Please attach your filled-out Officer Information Sheet (PDF) before submitting."
+      );
+      return;
+    }
+    if (!schoolIdFile) {
+      setStatus("error");
+      setError(
+        "Please attach a photo or scan of your School ID before submitting."
+      );
+      return;
+    }
 
     // The file inputs are uploaded separately (below); don't ship the binaries
     // to Forminit — we'd hit its free-tier limits.
@@ -831,12 +846,12 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
 
         {/* Attachments — two file inputs side-by-side */}
         <div className="sm:col-span-2 grid gap-4 sm:grid-cols-2">
-          {/* Resume / Portfolio PDF (optional) */}
+          {/* Officer Information Sheet PDF (required) */}
           <div>
             <label htmlFor="ap-resume" className="mb-1.5 block text-sm font-medium text-white/85">
-              Resume / Portfolio (PDF)
-              <span className="ml-1 text-xs font-normal text-white/50">
-                (optional · max {MAX_FILE_MB} MB)
+              Officer Information Sheet (PDF)
+              <span className="ml-1 text-xs font-normal text-gold">
+                (required · max {MAX_FILE_MB} MB)
               </span>
             </label>
             {!file ? (
@@ -848,7 +863,7 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
               >
                 <span className="flex items-center gap-2">
                   <Paperclip className="h-4 w-4 text-gold" />
-                  Choose a PDF
+                  Upload filled-out sheet (PDF)
                 </span>
                 <span className="text-xs text-white/50">Browse…</span>
               </label>
@@ -889,12 +904,12 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
             )}
           </div>
 
-          {/* School ID upload (optional — PDF or image) */}
+          {/* School ID upload (required — PDF or image) */}
           <div>
             <label htmlFor="ap-school-id" className="mb-1.5 block text-sm font-medium text-white/85">
               School ID (PDF or image)
-              <span className="ml-1 text-xs font-normal text-white/50">
-                (optional · max {MAX_FILE_MB} MB)
+              <span className="ml-1 text-xs font-normal text-gold">
+                (required · max {MAX_FILE_MB} MB)
               </span>
             </label>
             {!schoolIdFile ? (
@@ -906,7 +921,7 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
               >
                 <span className="flex items-center gap-2">
                   <Paperclip className="h-4 w-4 text-gold" />
-                  Choose a file
+                  Upload School ID
                 </span>
                 <span className="text-xs text-white/50">Browse…</span>
               </label>
@@ -991,8 +1006,16 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
         <div className="sm:col-span-2">
           <button
             type="submit"
-            disabled={busy || !dpaConsent}
-            title={!dpaConsent ? "Please tick the Data Privacy consent above" : ""}
+            disabled={busy || !dpaConsent || !file || !schoolIdFile}
+            title={
+              !file
+                ? "Please attach your Officer Information Sheet (PDF)"
+                : !schoolIdFile
+                ? "Please attach a photo/scan of your School ID"
+                : !dpaConsent
+                ? "Please tick the Data Privacy consent above"
+                : ""
+            }
             className="btn-gold w-full disabled:cursor-not-allowed disabled:opacity-70"
           >
             {status === "uploading" ? (
