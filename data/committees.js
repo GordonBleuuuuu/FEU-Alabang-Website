@@ -277,6 +277,10 @@ export const FAQ = [
     a: "Two files are required: (1) the Officer Information Sheet — download it from the Required Document section above, fill it out, and save it as a PDF named OIS_Surname and Name (e.g. OIS_Dela Cruz Juan); and (2) a photo or scan of your valid School ID. Both are uploaded in the application form's attachment section.",
   },
   {
+    q: "My School ID photo won't upload — what should I do?",
+    a: "The uploader is temporarily accepting PDFs only, so a JPG or PNG photo may be rejected. Quick workaround: save your School ID as a PDF and try again. On iPhone → open the photo → Share → Save to Files → tap-and-hold → Create PDF. On Android → open the photo → Share → Print → Save as PDF. On a laptop → right-click the image → Print → change destination to Save as PDF. Or upload to Google Drive → right-click → Open with Google Docs → File → Download → PDF Document. Full image support is being rolled out shortly.",
+  },
+  {
     q: "When will I hear back?",
     a: "Shortlisted applicants receive an interview invite within a few days after applications close. Final decisions are announced by email on the announcement date.",
   },

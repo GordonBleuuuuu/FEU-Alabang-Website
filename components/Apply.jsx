@@ -1080,6 +1080,11 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
               disabled={submitting}
               className="hidden"
             />
+            <p className="mt-2 text-xs text-white/60">
+              💡 Photo upload failing? Save your ID as a{" "}
+              <span className="font-semibold text-gold">PDF</span> first — see
+              FAQ below for how.
+            </p>
             {schoolIdError && (
               <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-300">
                 <AlertCircle className="h-3.5 w-3.5" />
