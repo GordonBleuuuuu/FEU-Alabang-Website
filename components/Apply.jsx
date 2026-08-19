@@ -23,6 +23,7 @@ import {
   X,
   Download,
   FileDown,
+  ShieldCheck,
 } from "lucide-react";
 import {
   APPLICATIONS_OPEN,
@@ -128,13 +129,20 @@ function CommitteeCard({ c, isSelected, onOpen }) {
         </div>
       )}
 
-      {c.responsibilities?.length ? (
-        <p className="mt-4 border-t border-white/10 pt-4 text-xs text-white/60">
-          <span className="font-semibold uppercase tracking-wider text-gold">
-            {c.responsibilities.length} responsibilities
-          </span>{" "}
-          — tap to view details
-        </p>
+      {(c.responsibilities?.length || c.requirements?.length) ? (
+        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-white/10 pt-4 text-xs text-white/60">
+          {c.requirements?.length ? (
+            <span className="font-semibold uppercase tracking-wider text-gold">
+              ⚑ {c.requirements.length} requirements
+            </span>
+          ) : null}
+          {c.responsibilities?.length ? (
+            <span className="font-semibold uppercase tracking-wider text-gold">
+              • {c.responsibilities.length} responsibilities
+            </span>
+          ) : null}
+          <span>— tap to view details</span>
+        </div>
       ) : null}
 
       <div className="mt-3 flex items-center justify-end gap-1 text-xs font-semibold text-gold/80 transition group-hover:text-gold">
@@ -285,6 +293,25 @@ function CommitteeDetailModal({ committee, onClose, onChoose, selected }) {
 
         {/* Body */}
         <div className="max-h-[50vh] overflow-y-auto p-6 sm:p-8">
+          {committee.requirements?.length ? (
+            <div className="mb-8 rounded-2xl border border-gold/40 bg-gold/10 p-5">
+              <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-feu-green">
+                <ShieldCheck className="h-4 w-4" /> Requirements to Apply
+              </h4>
+              <ul className="mt-3 space-y-2.5">
+                {committee.requirements.map((r, i) => (
+                  <li
+                    key={i}
+                    className="flex gap-2.5 text-[0.95rem] leading-relaxed text-slate-800"
+                  >
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-feu-green" />
+                    <span>{r}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
           {committee.responsibilities?.length ? (
             <>
               <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-feu-green">
@@ -303,11 +330,11 @@ function CommitteeDetailModal({ committee, onClose, onChoose, selected }) {
                 ))}
               </ul>
             </>
-          ) : (
+          ) : !committee.requirements?.length ? (
             <p className="text-sm text-slate-500">
               Details for this committee are being finalized.
             </p>
-          )}
+          ) : null}
         </div>
 
         {/* Footer — choose-this action when the form is open */}

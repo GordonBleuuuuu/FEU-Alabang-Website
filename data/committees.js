@@ -184,6 +184,11 @@ export const committees = [
     name: "Board of Directors",
     description:
       "Senior leadership seats that head each SCC portfolio and steer strategy across committees.",
+    requirements: [
+      "Must have completed at least two terms in a leadership position within the institution.",
+      "Willingness to commit time and actively participate in SCC-coordinated activities.",
+      "Has strong organizational, communication, and management skills.",
+    ],
     responsibilities: [
       "Leads one of the 9 director portfolios listed below.",
       "Reports progress, blockers, and outcomes directly to the executive board.",
