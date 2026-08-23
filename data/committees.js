@@ -8,8 +8,9 @@
 // =============================================================================
 
 // Emergency override for unexpected situations. The normal open/closed state
-// is calculated from APPLICATION_WINDOWS below.
-export const APPLICATIONS_ENABLED = true;
+// is calculated from APPLICATION_WINDOWS below. Applications are currently
+// closed while the next application window is pending.
+export const APPLICATIONS_ENABLED = false;
 
 // Real dates are set — countdown is live and ticks to opensAt / closesAt below.
 export const SHOW_COUNTDOWN = true;
