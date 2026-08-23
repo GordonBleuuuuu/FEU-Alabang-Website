@@ -7,12 +7,39 @@
 //  QUICK CHECKLIST — items marked ⚠️ TODO need your real data before launch.
 // =============================================================================
 
-// LIVE — Batch 1 applications are open (Aug 19 – 23, 2026).
-// After Batch 1 closes Aug 23, flip false again until Batch 2 opens Sept 24.
-export const APPLICATIONS_OPEN = true;
+// Emergency override for unexpected situations. The normal open/closed state
+// is calculated from APPLICATION_WINDOWS below.
+export const APPLICATIONS_ENABLED = true;
 
 // Real dates are set — countdown is live and ticks to opensAt / closesAt below.
 export const SHOW_COUNTDOWN = true;
+
+export const APPLICATION_WINDOWS = [
+  {
+    label: "Batch 1",
+    opensAt: "2026-08-19T09:00:00+08:00",
+    closesAt: "2026-08-23T23:59:00+08:00",
+  },
+  {
+    label: "Batch 2",
+    opensAt: "2026-09-24T09:00:00+08:00",
+    closesAt: "2026-09-28T23:59:00+08:00",
+  },
+];
+
+export function getActiveApplicationWindow(now = Date.now()) {
+  return APPLICATION_WINDOWS.find((window) => {
+    const opensAt = new Date(window.opensAt).getTime();
+    const closesAt = new Date(window.closesAt).getTime();
+    return now >= opensAt && now <= closesAt;
+  });
+}
+
+export function getNextApplicationWindow(now = Date.now()) {
+  return APPLICATION_WINDOWS
+    .filter((window) => new Date(window.opensAt).getTime() > now)
+    .sort((a, b) => new Date(a.opensAt) - new Date(b.opensAt))[0];
+}
 
 // -----------------------------------------------------------------------------
 // KEY DATES — used by the countdown timer, coming-soon banner, and timeline.

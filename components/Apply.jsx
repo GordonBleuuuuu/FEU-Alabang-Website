@@ -26,9 +26,11 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import {
-  APPLICATIONS_OPEN,
+  APPLICATIONS_ENABLED,
   SHOW_COUNTDOWN,
   APPLICATION_CYCLE,
+  getActiveApplicationWindow,
+  getNextApplicationWindow,
   TIMELINE,
   committees,
   FAQ,
@@ -1184,13 +1186,36 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
 
 // ============================================================================
 export default function Apply() {
+  // Start closed for SSR/hydration consistency, then determine availability on
+  // the client so the static page automatically follows the configured dates.
+  const [applicationWindow, setApplicationWindow] = useState(null);
+  const applicationsOpen = APPLICATIONS_ENABLED && Boolean(applicationWindow);
+
+  useEffect(() => {
+    const updateApplicationWindow = () => {
+      setApplicationWindow(getActiveApplicationWindow());
+    };
+    updateApplicationWindow();
+    const interval = setInterval(updateApplicationWindow, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const nextApplicationWindow = getNextApplicationWindow();
+
   // Committee-choice state lives here so both the detail modal ("Choose as 1st
   // choice" button) and the ApplicationForm (dropdowns) can read + update it.
   const [first, setFirst] = useState(
-    APPLICATIONS_OPEN ? committees[0]?.name || "" : ""
+    applicationsOpen ? committees[0]?.name || "" : ""
   );
   const [second, setSecond] = useState("");
   const [third, setThird] = useState("");
+
+  useEffect(() => {
+    if (applicationsOpen && !first) {
+      setFirst(committees[0]?.name || "");
+    }
+  }, [applicationsOpen, first]);
+
   // Committee currently open in the detail modal (null when closed).
   const [openedCommittee, setOpenedCommittee] = useState(null);
 
@@ -1238,22 +1263,22 @@ export default function Apply() {
         </div>
 
         {/* --- Countdown (hidden until SHOW_COUNTDOWN is flipped on) --- */}
-        {SHOW_COUNTDOWN && (
+        {SHOW_COUNTDOWN && (applicationsOpen || nextApplicationWindow) && (
           <div className="mt-10 flex flex-col items-center">
             <div className="text-xs font-semibold uppercase tracking-widest text-gold/80">
-              {APPLICATIONS_OPEN
+              {applicationsOpen
                 ? "Applications close in"
                 : "Applications open in"}
             </div>
             <div className="mt-3">
               <Countdown
                 targetIso={
-                  APPLICATIONS_OPEN
-                    ? APPLICATION_CYCLE.closesAt
-                    : APPLICATION_CYCLE.opensAt
+                  applicationsOpen
+                    ? applicationWindow.closesAt
+                    : nextApplicationWindow.opensAt
                 }
                 passedLabel={
-                  APPLICATIONS_OPEN ? "Applications closed" : "Now open!"
+                  applicationsOpen ? "Applications closed" : "Now open!"
                 }
               />
             </div>
@@ -1329,7 +1354,7 @@ export default function Apply() {
 
         {/* --- Form area --- */}
         <div className="mt-16">
-          {!APPLICATIONS_OPEN ? (
+          {!applicationsOpen ? (
             <div className="mx-auto max-w-2xl rounded-3xl border border-white/10 bg-white/[0.05] p-8 backdrop-blur-xl sm:p-10">
               <div className="flex flex-col items-center text-center">
                 <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gold text-feu-moss shadow-gold">
@@ -1385,7 +1410,7 @@ export default function Apply() {
       <CommitteeDetailModal
         committee={openedCommittee}
         onClose={() => setOpenedCommittee(null)}
-        onChoose={APPLICATIONS_OPEN ? handleChooseCommittee : null}
+        onChoose={applicationsOpen ? handleChooseCommittee : null}
         selected={first}
       />
     </section>
