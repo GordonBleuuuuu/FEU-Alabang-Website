@@ -62,7 +62,7 @@ export const APPLICATION_CYCLE = {
   closesAt: "2026-08-23T23:59:00+08:00",
   // Screening + interview windows (Batch 1).
   screeningWindow: "August 24 – 28, 2026",
-  interviewsWindow: "September 1 – 2, 2026",
+  interviewsWindow: "August 25 – 28, 2026",
   // Batch 2 window for late applicants.
   batch2Window: "August 25 – September 28, 2026",
   // ⚠️ TODO: set the announcement date once final.
@@ -79,7 +79,7 @@ export const TIMELINE = [
   {
     step: "1",
     title: "Applications",
-    date: "Batch 1: Aug 19 – 23  ·  Batch 2: Sept 24 – 28, 2026",
+    date: "Batch 1: Aug 19 – 23  ·  Batch 2: Aug 24 – 28, 2026",
     description:
       "Submit your application in either the Batch 1 or Batch 2 window.",
   },
@@ -92,7 +92,7 @@ export const TIMELINE = [
   {
     step: "3",
     title: "Interviews",
-    date: "September 1 – 2, 2026",
+    date: "August 25 – 28, 2026",
     description: "Shortlisted applicants are invited to a short interview.",
   },
   {
