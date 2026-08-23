@@ -51,7 +51,7 @@ export const APPLICATION_CYCLE = {
   opensAt: "2026-08-19T09:00:00+08:00",
   closesAt: "2026-08-23T23:59:00+08:00",
   // Screening + interview windows (Batch 1).
-  screeningWindow: "August 29 – 31, 2026",
+  screeningWindow: "August 24 – 28, 2026",
   interviewsWindow: "September 1 – 2, 2026",
   // Batch 2 window for late applicants.
   batch2Window: "September 24 – 28, 2026",
@@ -76,7 +76,7 @@ export const TIMELINE = [
   {
     step: "2",
     title: "Screening",
-    date: "August 29 – 31, 2026",
+    date: "August 24 – 28, 2026",
     description: "The SCC reviews every submission carefully.",
   },
   {
