@@ -10,7 +10,7 @@
 // Emergency override for unexpected situations. The normal open/closed state
 // is calculated from APPLICATION_WINDOWS below. Applications are currently
 // closed while the next application window is pending.
-export const APPLICATIONS_ENABLED = false;
+export const APPLICATIONS_ENABLED = true;
 
 // Real dates are set — countdown is live and ticks to opensAt / closesAt below.
 export const SHOW_COUNTDOWN = true;
@@ -23,8 +23,17 @@ export const APPLICATION_WINDOWS = [
   },
   {
     label: "Batch 2",
-    opensAt: "2026-09-24T09:00:00+08:00",
+    opensAt: "2026-08-25T09:00:00+08:00",
     closesAt: "2026-09-28T23:59:00+08:00",
+    eligibleCommittees: [
+      "Publicity Committee",
+      "Communications Committee",
+      "Finance Committee",
+      "Technicals Committee",
+      "Secretariat Committee",
+      "Board of Directors",
+      "Course Representative",
+    ],
   },
 ];
 
@@ -55,7 +64,7 @@ export const APPLICATION_CYCLE = {
   screeningWindow: "August 24 – 28, 2026",
   interviewsWindow: "September 1 – 2, 2026",
   // Batch 2 window for late applicants.
-  batch2Window: "September 24 – 28, 2026",
+  batch2Window: "August 25 – September 28, 2026",
   // ⚠️ TODO: set the announcement date once final.
   announcementDate: "TBA",
   // Term the accepted applicants will serve.

@@ -155,13 +155,13 @@ function CommitteeCard({ c, isSelected, onOpen }) {
   );
 }
 
-function CommitteesGrid({ onOpen, selected }) {
-  if (!committees.length) return null;
+function CommitteesGrid({ onOpen, selected, availableCommittees }) {
+  if (!availableCommittees.length) return null;
 
-  const committeeItems = committees.filter(
+  const committeeItems = availableCommittees.filter(
     (c) => (c.type || "committee") === "committee"
   );
-  const leadershipItems = committees.filter((c) => c.type === "leadership");
+  const leadershipItems = availableCommittees.filter((c) => c.type === "leadership");
 
   return (
     <div className="space-y-10">
@@ -551,7 +551,15 @@ function NotifyMeForm() {
 // The 1st/2nd/3rd choice state is owned by the parent Apply component so that
 // the CommitteesGrid can also drive it — clicking a committee card selects it
 // as the applicant's 1st choice.
-function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }) {
+function ApplicationForm({
+  first,
+  setFirst,
+  second,
+  setSecond,
+  third,
+  setThird,
+  availableCommittees,
+}) {
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
   // Attached files (both optional). `file` is the resume/portfolio PDF;
@@ -564,8 +572,8 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
   const [dpaConsent, setDpaConsent] = useState(false);
 
   const firstCommittee = useMemo(
-    () => committees.find((c) => c.name === first),
-    [first]
+    () => availableCommittees.find((c) => c.name === first),
+    [availableCommittees, first]
   );
 
   const handleFileChange = (e) => {
@@ -754,7 +762,7 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
       if (res.ok) {
         setStatus("success");
         form.reset();
-        setFirst(committees[0]?.name || "");
+        setFirst(availableCommittees[0]?.name || "");
         setSecond("");
         setThird("");
         clearFile();
@@ -779,7 +787,7 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
 
   // Options for 2nd/3rd choice — exclude already-picked committees.
   const optionsExcluding = (exclude) =>
-    committees.filter((c) => !exclude.includes(c.name));
+    availableCommittees.filter((c) => !exclude.includes(c.name));
 
   // Render options grouped into Committees + Leadership Positions using
   // <optgroup> so the two sets stay visually separated in the dropdown too.
@@ -879,7 +887,7 @@ function ApplicationForm({ first, setFirst, second, setSecond, third, setThird }
                 disabled={submitting}
                 className={inputClass}
               >
-                {renderGroupedOptions(committees)}
+                {renderGroupedOptions(availableCommittees)}
               </select>
             </div>
             <div>
@@ -1201,20 +1209,26 @@ export default function Apply() {
   }, []);
 
   const nextApplicationWindow = getNextApplicationWindow();
+  const configuredWindow = applicationWindow || nextApplicationWindow;
+  const availableCommittees = configuredWindow?.eligibleCommittees
+    ? committees.filter((committee) =>
+        configuredWindow.eligibleCommittees.includes(committee.name)
+      )
+    : committees;
 
   // Committee-choice state lives here so both the detail modal ("Choose as 1st
   // choice" button) and the ApplicationForm (dropdowns) can read + update it.
   const [first, setFirst] = useState(
-    applicationsOpen ? committees[0]?.name || "" : ""
+    applicationsOpen ? availableCommittees[0]?.name || "" : ""
   );
   const [second, setSecond] = useState("");
   const [third, setThird] = useState("");
 
   useEffect(() => {
     if (applicationsOpen && !first) {
-      setFirst(committees[0]?.name || "");
+      setFirst(availableCommittees[0]?.name || "");
     }
-  }, [applicationsOpen, first]);
+  }, [applicationsOpen, availableCommittees, first]);
 
   // Committee currently open in the detail modal (null when closed).
   const [openedCommittee, setOpenedCommittee] = useState(null);
@@ -1349,7 +1363,11 @@ export default function Apply() {
             <Users className="h-5 w-5 text-gold" />
             <h3 className="text-xl font-black">What you can join</h3>
           </div>
-          <CommitteesGrid onOpen={setOpenedCommittee} selected={first} />
+          <CommitteesGrid
+            onOpen={setOpenedCommittee}
+            selected={first}
+            availableCommittees={availableCommittees}
+          />
         </div>
 
         {/* --- Form area --- */}
@@ -1378,7 +1396,7 @@ export default function Apply() {
                 <Info className="h-4 w-4 text-gold" />
                 Every field is reviewed. Take your time — this is your pitch.
               </div>
-              {committees.length > 0 ? (
+              {availableCommittees.length > 0 ? (
                 <ApplicationForm
                   first={first}
                   setFirst={setFirst}
@@ -1386,6 +1404,7 @@ export default function Apply() {
                   setSecond={setSecond}
                   third={third}
                   setThird={setThird}
+                  availableCommittees={availableCommittees}
                 />
               ) : (
                 <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 text-center text-sm text-white/70">
