@@ -24,7 +24,7 @@ export const APPLICATION_WINDOWS = [
   {
     label: "Batch 2",
     opensAt: "2026-08-25T09:00:00+08:00",
-    closesAt: "2026-09-28T23:59:00+08:00",
+    closesAt: "2026-08-28T23:59:00+08:00",
     eligibleCommittees: [
       "Publicity Committee",
       "Communications Committee",
