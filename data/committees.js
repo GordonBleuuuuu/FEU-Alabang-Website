@@ -65,8 +65,7 @@ export const APPLICATION_CYCLE = {
   interviewsWindow: "August 25 – 28, 2026",
   // Batch 2 window for late applicants.
   batch2Window: "August 25 – September 28, 2026",
-  // ⚠️ TODO: set the announcement date once final.
-  announcementDate: "TBA",
+  announcementDate: "August 29, 2026",
   // Term the accepted applicants will serve.
   termLabel: "S.Y. 2026 – 2027",
 };
@@ -98,7 +97,7 @@ export const TIMELINE = [
   {
     step: "4",
     title: "Announcement",
-    date: "TBA",
+    date: "August 29, 2026",
     description: "Accepted committee members are notified via email.",
   },
 ];
