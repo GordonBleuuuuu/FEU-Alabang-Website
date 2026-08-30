@@ -24,6 +24,8 @@ import {
   Download,
   FileDown,
   ShieldCheck,
+  LockKeyhole,
+  Megaphone,
 } from "lucide-react";
 import {
   APPLICATIONS_ENABLED,
@@ -32,6 +34,7 @@ import {
   getActiveApplicationWindow,
   getNextApplicationWindow,
   TIMELINE,
+  ACCEPTED_COMMITTEES,
   committees,
   FAQ,
 } from "@/data/committees";
@@ -80,6 +83,56 @@ function TimelineStrip() {
         </li>
       ))}
     </ol>
+  );
+}
+
+function AcceptedCommitteeAnnouncement() {
+  const revealAt = new Date(APPLICATION_CYCLE.announcementRevealAt).getTime();
+  const [isRevealed, setIsRevealed] = useState(() => Date.now() >= revealAt);
+
+  useEffect(() => {
+    const updateRevealState = () => setIsRevealed(Date.now() >= revealAt);
+    updateRevealState();
+    const interval = setInterval(updateRevealState, 30_000);
+    return () => clearInterval(interval);
+  }, [revealAt]);
+
+  return (
+    <div className="mt-10 rounded-3xl border border-gold/35 bg-gold/[0.08] p-6 backdrop-blur-sm sm:p-8">
+      <div className="flex items-start gap-4">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gold text-feu-moss shadow-gold">
+          {isRevealed ? <Megaphone className="h-6 w-6" /> : <LockKeyhole className="h-6 w-6" />}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="text-xs font-semibold uppercase tracking-wider text-gold">
+            {isRevealed ? "Official announcement" : "Announcement coming soon"}
+          </div>
+          <h3 className="mt-1 text-xl font-black sm:text-2xl">
+            Accepted committees
+          </h3>
+          {!isRevealed ? (
+            <p className="mt-2 text-sm leading-relaxed text-white/75">
+              The accepted committee assignments will be revealed on Tuesday, September 1, 2026.
+            </p>
+          ) : ACCEPTED_COMMITTEES.length > 0 ? (
+            <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+              {ACCEPTED_COMMITTEES.map((committee) => (
+                <li
+                  key={committee}
+                  className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm font-bold text-white"
+                >
+                  {committee}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-2 text-sm leading-relaxed text-white/75">
+              The accepted committee list will be posted here.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1307,6 +1360,9 @@ export default function Apply() {
           </div>
           <TimelineStrip />
         </div>
+
+        {/* --- Accepted committee announcement --- */}
+        <AcceptedCommitteeAnnouncement />
 
         {/* --- Required document (Officer Information Sheet) --- */}
         <div className="mt-16">

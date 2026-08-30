@@ -66,9 +66,13 @@ export const APPLICATION_CYCLE = {
   // Batch 2 window for late applicants.
   batch2Window: "August 25 – September 28, 2026",
   announcementDate: "September 1, 2026",
+  announcementRevealAt: "2026-09-01T00:00:00+08:00",
   // Term the accepted applicants will serve.
   termLabel: "S.Y. 2026 – 2027",
 };
+
+// Add the accepted committee names here before the announcement goes live.
+export const ACCEPTED_COMMITTEES = [];
 
 // -----------------------------------------------------------------------------
 // TIMELINE — the 4-step "Apply → Screen → Interview → Announce" strip.
