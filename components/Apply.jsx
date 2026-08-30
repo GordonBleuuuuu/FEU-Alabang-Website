@@ -88,10 +88,13 @@ function TimelineStrip() {
 
 function AcceptedCommitteeAnnouncement() {
   const revealAt = new Date(APPLICATION_CYCLE.announcementRevealAt).getTime();
-  const [isRevealed, setIsRevealed] = useState(() => Date.now() >= revealAt);
+  const [isRevealed, setIsRevealed] = useState(
+    () => APPLICATION_CYCLE.announcementPublished || Date.now() >= revealAt
+  );
 
   useEffect(() => {
-    const updateRevealState = () => setIsRevealed(Date.now() >= revealAt);
+    const updateRevealState = () =>
+      setIsRevealed(APPLICATION_CYCLE.announcementPublished || Date.now() >= revealAt);
     updateRevealState();
     const interval = setInterval(updateRevealState, 30_000);
     return () => clearInterval(interval);
@@ -115,13 +118,20 @@ function AcceptedCommitteeAnnouncement() {
               The accepted committee assignments will be revealed on Tuesday, September 1, 2026.
             </p>
           ) : ACCEPTED_COMMITTEES.length > 0 ? (
-            <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            <ul className="mt-4 grid gap-4 sm:grid-cols-2">
               {ACCEPTED_COMMITTEES.map((committee) => (
                 <li
-                  key={committee}
-                  className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm font-bold text-white"
+                  key={committee.name}
+                  className="rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3"
                 >
-                  {committee}
+                  <div className="text-sm font-black uppercase tracking-wide text-gold">
+                    {committee.name}
+                  </div>
+                  <ul className="mt-2 space-y-1 text-sm text-white/80">
+                    {committee.members.map((member) => (
+                      <li key={member}>{member}</li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>

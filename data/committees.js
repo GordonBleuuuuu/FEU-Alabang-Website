@@ -67,12 +67,59 @@ export const APPLICATION_CYCLE = {
   batch2Window: "August 25 – September 28, 2026",
   announcementDate: "September 1, 2026",
   announcementRevealAt: "2026-09-01T00:00:00+08:00",
+  announcementPublished: true,
   // Term the accepted applicants will serve.
   termLabel: "S.Y. 2026 – 2027",
 };
 
-// Add the accepted committee names here before the announcement goes live.
-export const ACCEPTED_COMMITTEES = [];
+export const ACCEPTED_COMMITTEES = [
+  {
+    name: "Creatives",
+    members: [
+      "Charice Lei Patanao",
+      "Princess Nicole Villacampa",
+      "Paulina Beatrix Atienza",
+      "Diane Lumba",
+    ],
+  },
+  {
+    name: "Documentations",
+    members: [
+      "Fatima Andrea Claire Capistrano",
+      "Matthew Jonathan Eduarte",
+      "Sean Terrence Mallari",
+      "Sophia Ann Geronimo",
+      "Christian Jay Flores",
+      "Daniel Inigo Sarmiento",
+      "AJ Aldaya",
+      "Natalee Mora",
+    ],
+  },
+  {
+    name: "Finance",
+    members: ["Carlos James Prepuse", "Patricia Mae Bucao"],
+  },
+  {
+    name: "Logistics",
+    members: ["Gae-A Charm Tangson"],
+  },
+  {
+    name: "Programs",
+    members: ["John Nicolas Gameng"],
+  },
+  {
+    name: "Technicals",
+    members: ["Kyle Bodoso De Jesus"],
+  },
+  {
+    name: "Programs Director",
+    members: ["Hannah Claire Orgeta"],
+  },
+  {
+    name: "Communications Director",
+    members: ["Faridah Ashley Lhyanne Padua"],
+  },
+];
 
 // -----------------------------------------------------------------------------
 // TIMELINE — the 4-step "Apply → Screen → Interview → Announce" strip.
