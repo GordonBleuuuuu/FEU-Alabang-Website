@@ -8,8 +8,7 @@
 // =============================================================================
 
 // Emergency override for unexpected situations. The normal open/closed state
-// is calculated from APPLICATION_WINDOWS below. Applications are currently
-// closed while the next application window is pending.
+// is calculated from APPLICATION_WINDOWS below.
 export const APPLICATIONS_ENABLED = true;
 
 // Real dates are set — countdown is live and ticks to opensAt / closesAt below.
@@ -34,6 +33,12 @@ export const APPLICATION_WINDOWS = [
       "Board of Directors",
       "Course Representative",
     ],
+  },
+  {
+    label: "Course Representatives & Directors",
+    opensAt: "2026-09-04T00:00:00+08:00",
+    closesAt: "2026-09-12T23:59:00+08:00",
+    eligibleCommittees: ["Board of Directors", "Course Representative"],
   },
 ];
 
