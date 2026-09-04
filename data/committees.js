@@ -11,8 +11,8 @@
 // is calculated from APPLICATION_WINDOWS below.
 export const APPLICATIONS_ENABLED = true;
 
-// Real dates are set — countdown is live and ticks to opensAt / closesAt below.
-export const SHOW_COUNTDOWN = true;
+// Leadership applications remain open until manually closed.
+export const SHOW_COUNTDOWN = false;
 
 export const APPLICATION_WINDOWS = [
   {
@@ -36,8 +36,8 @@ export const APPLICATION_WINDOWS = [
   },
   {
     label: "Course Representatives & Directors",
-    opensAt: "2026-09-04T00:00:00+08:00",
-    closesAt: "2026-09-12T23:59:00+08:00",
+    opensAt: "2026-09-01T00:00:00+08:00",
+    closesAt: "2099-12-31T23:59:00+08:00",
     eligibleCommittees: ["Board of Directors", "Course Representative"],
   },
 ];
