@@ -85,12 +85,12 @@ export const ACCEPTED_COMMITTEES = [
   {
     name: "Documentations",
     members: [
-      "Fatima Andrea Claire Capistrano",
+      "Fatima Andrea Claire Naynes Capistrano",
       "Matthew Jonathan Eduarte",
       "Sean Terrence Mallari",
-      "Sophia Ann Geronimo",
+      "Sophia Ann Celestino Geronimo",
       "Christian Jay Flores",
-      "Daniel Inigo Sarmiento",
+      "Daniel Iñigo Sarmiento",
       "AJ Aldaya",
       "Natalee Mora",
     ],
