@@ -1,7 +1,12 @@
 import { LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import AdminWorkspace, { type ManagedEvent } from "@/components/admin/AdminWorkspace";
+import AdminWorkspace, {
+  type AppRole,
+  type ManagedEvent,
+  type Notification,
+  type Organization,
+} from "@/components/admin/AdminWorkspace";
 import { type BoardTask } from "@/components/admin/AdminBoard";
 import { createClient } from "@/lib/supabase/server";
 
@@ -23,18 +28,25 @@ export default async function AdminPage() {
     return <AccessDenied message="Your account does not have access to the internal workspace." />;
   }
 
-  const [tasksResult, eventsResult] = await Promise.all([
+  const [tasksResult, eventsResult, organizationsResult, membershipsResult, notificationsResult] = await Promise.all([
     supabase
       .from("tasks")
       .select("id,task_key,title,description,status,priority,assignee_id,due_at,position")
       .order("position", { ascending: true }),
     supabase
       .from("events")
-      .select("id,title,slug,description,organizer_name,venue,starts_at,ends_at,status,is_public,registration_url,image_url")
+      .select("id,title,slug,description,organizer_name,organization_id,venue,starts_at,ends_at,status,is_public,registration_url,image_url,category,contact_name,contact_email,capacity,review_notes")
       .order("starts_at", { ascending: true }),
+    supabase.from("organizations").select("id,name,acronym,slug").eq("is_active", true).order("name"),
+    supabase.from("organization_members").select("organization_id").eq("user_id", authData.user.id),
+    supabase.from("notifications").select("id,title,message,event_id,read_at,created_at").order("created_at", { ascending: false }).limit(50),
   ]);
 
-  const loadError = tasksResult.error ?? eventsResult.error;
+  const loadError = tasksResult.error ?? eventsResult.error ?? organizationsResult.error ?? membershipsResult.error ?? notificationsResult.error;
+  const manageableOrganizationIds = new Set((membershipsResult.data ?? []).map((membership) => membership.organization_id));
+  const organizations = profile.role === "SADU"
+    ? organizationsResult.data ?? []
+    : (organizationsResult.data ?? []).filter((organization) => manageableOrganizationIds.has(organization.id));
 
   return (
     <main className="min-h-screen bg-cloud px-5 py-8 sm:px-8">
@@ -61,8 +73,11 @@ export default async function AdminPage() {
           </p>
         ) : (
           <AdminWorkspace
+            currentRole={profile.role as AppRole}
             initialTasks={(tasksResult.data ?? []) as BoardTask[]}
             initialEvents={(eventsResult.data ?? []) as ManagedEvent[]}
+            organizations={organizations as Organization[]}
+            initialNotifications={(notificationsResult.data ?? []) as Notification[]}
           />
         )}
       </div>
