@@ -1,30 +1,32 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from "tailwindcss";
+
+const config = {
   content: [
-    "./app/**/*.{js,jsx,ts,tsx}",
-    "./components/**/*.{js,jsx,ts,tsx}",
-    "./data/**/*.{js,jsx,ts,tsx}",
+    "./app/**/*.{js,jsx,ts,tsx,mdx}",
+    "./components/**/*.{js,jsx,ts,tsx,mdx}",
+    "./data/**/*.{js,jsx,ts,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        // FEU Alabang SCC brand palette
+        // Required FEUASCC design tokens. Nested keys generate classes such as
+        // bg-feu-green, text-feu-teal, and border-gold-default.
         feu: {
-          green: "#004B23",   // Deep FEU green
-          teal: "#0F5257",    // Secondary teal-green
-          leaf: "#3A7D44",    // Lighter leaf accent
-          moss: "#0A3D1F",    // Darkest green for depth
+          green: "#004B23",
+          teal: "#0F5257",
+          moss: "#0A3D1F",
         },
         gold: {
           DEFAULT: "#FFB703",
-          soft: "#FFD166",
+          default: "#FFB703",
           deep: "#D4AF37",
+          soft: "#FFD166",
         },
         ink: {
-          DEFAULT: "#0F172A", // Slate dark
+          DEFAULT: "#0F172A",
           soft: "#1E293B",
         },
-        cloud: "#F8FAFC",     // Clean light slate
+        cloud: "#F8FAFC",
       },
       fontFamily: {
         sans: [
@@ -33,9 +35,6 @@ module.exports = {
           "system-ui",
           "-apple-system",
           "Segoe UI",
-          "Roboto",
-          "Helvetica",
-          "Arial",
           "sans-serif",
         ],
       },
@@ -56,8 +55,8 @@ module.exports = {
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         float: {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-10px)" },
+          "0%, 100%": { transform: "translateY(0px) rotate(-1deg)" },
+          "50%": { transform: "translateY(-10px) rotate(1deg)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
@@ -72,4 +71,6 @@ module.exports = {
     },
   },
   plugins: [],
-};
+} satisfies Config;
+
+export default config;

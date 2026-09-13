@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // Hero background photos. Drop image files into /public/hero/ using these
 // names. Missing files are skipped gracefully — the green background shows
@@ -33,7 +33,10 @@ export default function HeroSlideshow() {
   // not all at once). Starts with the first + next slide.
   const [loadSet, setLoadSet] = useState(() => new Set([0, 1]));
 
-  const valid = SLIDES.map((_, i) => i).filter((i) => !failed[i]);
+  const valid = useMemo(
+    () => SLIDES.map((_, i) => i).filter((i) => !failed[i]),
+    [failed]
+  );
   const activeIdx = valid.length ? valid[index % valid.length] : -1;
 
   // Advance the slideshow.
@@ -54,7 +57,7 @@ export default function HeroSlideshow() {
       s.add(nextIdx);
       return s;
     });
-  }, [index, activeIdx, valid.length]);
+  }, [index, activeIdx, valid]);
 
   return (
     <div className="absolute inset-0 overflow-hidden" aria-hidden="true">

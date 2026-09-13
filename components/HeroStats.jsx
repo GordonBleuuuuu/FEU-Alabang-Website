@@ -22,6 +22,7 @@ export default function HeroStats() {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    const scheduledRafs = rafsRef.current;
 
     const start = () => {
       if (startedRef.current) return;
@@ -44,7 +45,7 @@ export default function HeroStats() {
         const tick = (now) => {
           const elapsed = now - startAt;
           if (elapsed < 0) {
-            rafsRef.current[i] = requestAnimationFrame(tick);
+            scheduledRafs[i] = requestAnimationFrame(tick);
             return;
           }
           const t = Math.min(1, elapsed / duration);
@@ -56,9 +57,9 @@ export default function HeroStats() {
             next[i] = value;
             return next;
           });
-          if (t < 1) rafsRef.current[i] = requestAnimationFrame(tick);
+          if (t < 1) scheduledRafs[i] = requestAnimationFrame(tick);
         };
-        rafsRef.current[i] = requestAnimationFrame(tick);
+        scheduledRafs[i] = requestAnimationFrame(tick);
       });
     };
 
@@ -81,7 +82,7 @@ export default function HeroStats() {
     return () => {
       observer.disconnect();
       clearTimeout(kick);
-      rafsRef.current.forEach((id) => id && cancelAnimationFrame(id));
+      scheduledRafs.forEach((id) => id && cancelAnimationFrame(id));
     };
   }, []);
 

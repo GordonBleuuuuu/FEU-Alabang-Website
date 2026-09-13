@@ -1,5 +1,6 @@
-import Navbar from "@/components/Navbar";
+import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
+import PublicCalendar from "@/components/calendar/PublicCalendar";
 import About from "@/components/About";
 import Leadership from "@/components/Leadership";
 import Activities from "@/components/Activities";
@@ -11,8 +12,9 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <main className="min-h-screen bg-cloud">
-      <Navbar />
+      <Navigation />
       <Hero />
+      <PublicCalendar />
       <About />
       <Leadership />
       <Activities />
