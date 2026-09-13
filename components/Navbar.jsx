@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, X, ChevronRight } from "lucide-react";
+import { Menu, X, ArrowUpRight, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import Logo from "./Logo";
 
 const NAV_LINKS = [
@@ -112,10 +113,13 @@ export default function Navbar() {
         </div>
 
         <div className="hidden lg:block">
-          <a href="#resources" className="btn-gold px-5 py-2.5 text-sm">
-            Contact SCC
-            <ChevronRight className="h-4 w-4" />
-          </a>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 rounded-full border border-gold/60 bg-gold/10 px-5 py-2.5 text-sm font-bold text-gold transition hover:bg-gold hover:text-feu-moss focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          >
+            Executive Portal
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
 
         <button
@@ -165,6 +169,14 @@ export default function Navbar() {
           >
             Contact SCC
           </a>
+          <Link
+            href="/login"
+            onClick={() => setOpen(false)}
+            className="mt-1 inline-flex items-center justify-center gap-2 rounded-full border border-gold/60 bg-gold/10 px-6 py-3 text-sm font-bold text-gold"
+          >
+            Executive Portal
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </header>
