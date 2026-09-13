@@ -1,7 +1,8 @@
 import { LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import AdminBoard, { type BoardTask } from "@/components/admin/AdminBoard";
+import AdminWorkspace, { type ManagedEvent } from "@/components/admin/AdminWorkspace";
+import { type BoardTask } from "@/components/admin/AdminBoard";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -22,10 +23,18 @@ export default async function AdminPage() {
     return <AccessDenied message="Your account does not have access to the internal workspace." />;
   }
 
-  const { data: tasks, error } = await supabase
-    .from("tasks")
-    .select("id,task_key,title,description,status,priority,assignee_id,due_at,position")
-    .order("position", { ascending: true });
+  const [tasksResult, eventsResult] = await Promise.all([
+    supabase
+      .from("tasks")
+      .select("id,task_key,title,description,status,priority,assignee_id,due_at,position")
+      .order("position", { ascending: true }),
+    supabase
+      .from("events")
+      .select("id,title,slug,description,organizer_name,venue,starts_at,ends_at,status,is_public,registration_url,image_url")
+      .order("starts_at", { ascending: true }),
+  ]);
+
+  const loadError = tasksResult.error ?? eventsResult.error;
 
   return (
     <main className="min-h-screen bg-cloud px-5 py-8 sm:px-8">
@@ -46,12 +55,15 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        {error ? (
+        {loadError ? (
           <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-5 text-red-700">
-            The project board could not be loaded.
+            The internal workspace could not be loaded: {loadError.message}
           </p>
         ) : (
-          <AdminBoard initialTasks={(tasks ?? []) as BoardTask[]} />
+          <AdminWorkspace
+            initialTasks={(tasksResult.data ?? []) as BoardTask[]}
+            initialEvents={(eventsResult.data ?? []) as ManagedEvent[]}
+          />
         )}
       </div>
     </main>
