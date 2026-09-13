@@ -1,5 +1,6 @@
 import { LockKeyhole } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import AdminBoard, { type BoardTask } from "@/components/admin/AdminBoard";
 import { createClient } from "@/lib/supabase/server";
 
@@ -9,7 +10,7 @@ export default async function AdminPage() {
   const supabase = await createClient();
   const { data: authData } = await supabase.auth.getUser();
 
-  if (!authData.user) return <AccessDenied message="Sign in with an authorized FEU account to continue." />;
+  if (!authData.user) redirect("/login");
 
   const { data: profile } = await supabase
     .from("users")
@@ -37,7 +38,12 @@ export default async function AdminPage() {
               Signed in as {profile.display_name || authData.user.email} · {profile.role}
             </p>
           </div>
-          <Link href="/" className="text-sm font-bold text-feu-green hover:underline">View public calendar</Link>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="text-sm font-bold text-feu-green hover:underline">View public calendar</Link>
+            <form action="/auth/signout" method="post">
+              <button type="submit" className="text-sm font-bold text-slate-500 hover:text-ink">Sign out</button>
+            </form>
+          </div>
         </div>
 
         {error ? (
