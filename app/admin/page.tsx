@@ -7,7 +7,7 @@ import AdminWorkspace, {
   type Notification,
   type Organization,
 } from "@/components/admin/AdminWorkspace";
-import { type BoardTask } from "@/components/admin/AdminBoard";
+import { type BoardTask, type TaskLabel } from "@/components/admin/AdminBoard";
 import { type TeamMember } from "@/components/admin/TaskDrawer";
 import { createClient } from "@/lib/supabase/server";
 
@@ -32,7 +32,7 @@ export default async function AdminPage() {
   const [tasksResult, eventsResult, organizationsResult, membershipsResult, notificationsResult, teamMembersResult] = await Promise.all([
     supabase
       .from("tasks")
-      .select("id,task_key,title,description,status,priority,assignee_id,due_at,position,event_id")
+      .select("id,task_key,title,description,status,priority,assignee_id,due_at,position,event_id,task_label_links(task_labels(id,name,color))")
       .order("position", { ascending: true }),
     supabase
       .from("events")
@@ -49,6 +49,11 @@ export default async function AdminPage() {
   const organizations = profile.role === "SADU"
     ? organizationsResult.data ?? []
     : (organizationsResult.data ?? []).filter((organization) => manageableOrganizationIds.has(organization.id));
+  const initialTasks = (tasksResult.data ?? []).map((task) => {
+    const row = task as typeof task & { task_label_links?: Array<{ task_labels: TaskLabel | TaskLabel[] | null }> };
+    const { task_label_links, ...taskFields } = row;
+    return { ...taskFields, labels: task_label_links?.flatMap((link) => Array.isArray(link.task_labels) ? link.task_labels : link.task_labels ? [link.task_labels] : []) ?? [] };
+  }) as BoardTask[];
 
   return (
     <main className="min-h-screen bg-cloud px-5 py-8 sm:px-8">
@@ -76,7 +81,7 @@ export default async function AdminPage() {
         ) : (
           <AdminWorkspace
             currentRole={profile.role as AppRole}
-            initialTasks={(tasksResult.data ?? []) as BoardTask[]}
+            initialTasks={initialTasks}
             initialEvents={(eventsResult.data ?? []) as ManagedEvent[]}
             organizations={organizations as Organization[]}
             initialNotifications={(notificationsResult.data ?? []) as Notification[]}

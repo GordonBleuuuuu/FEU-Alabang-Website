@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, CalendarClock, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarClock, Search, UserRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export type TaskStatus = "backlog" | "todo" | "in_progress" | "review" | "done";
 export type TaskPriority = "lowest" | "low" | "medium" | "high" | "highest";
+export type TaskLabel = { id: string; name: string; color: string };
 
 export type BoardTask = {
   id: string;
@@ -18,6 +19,7 @@ export type BoardTask = {
   due_at: string | null;
   position: number;
   event_id: string | null;
+  labels: TaskLabel[];
 };
 
 const columns: { status: TaskStatus; title: string }[] = [
@@ -47,12 +49,29 @@ type AdminBoardProps = {
 export default function AdminBoard({ tasks, onTasksChange, onError, onOpenTask, assignees }: AdminBoardProps) {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [assigneeFilter, setAssigneeFilter] = useState("all");
+  const [labelFilter, setLabelFilter] = useState("all");
+
+  const availableLabels = useMemo(() => {
+    const labels = new Map<string, TaskLabel>();
+    tasks.forEach((task) => task.labels.forEach((label) => labels.set(label.id, label)));
+    return [...labels.values()].sort((left, right) => left.name.localeCompare(right.name));
+  }, [tasks]);
+  const filteredTasks = useMemo(() => tasks.filter((task) => {
+    const searchable = `${task.task_key} ${task.title} ${task.description}`.toLowerCase();
+    return (!search || searchable.includes(search.toLowerCase()))
+      && (priorityFilter === "all" || task.priority === priorityFilter)
+      && (assigneeFilter === "all" || task.assignee_id === assigneeFilter)
+      && (labelFilter === "all" || task.labels.some((label) => label.id === labelFilter));
+  }), [tasks, search, priorityFilter, assigneeFilter, labelFilter]);
 
   const groupedTasks = useMemo(
     () => Object.fromEntries(
-      columns.map(({ status }) => [status, tasks.filter((task) => task.status === status)]),
+      columns.map(({ status }) => [status, filteredTasks.filter((task) => task.status === status)]),
     ) as Record<TaskStatus, BoardTask[]>,
-    [tasks],
+    [filteredTasks],
   );
 
   async function moveTask(task: BoardTask, direction: -1 | 1) {
@@ -81,6 +100,13 @@ export default function AdminBoard({ tasks, onTasksChange, onError, onOpenTask, 
   }
 
   return (
+    <div>
+      <div className="mb-5 grid gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
+        <label className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search tasks" className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-feu-green" /></label>
+        <select value={assigneeFilter} onChange={(event) => setAssigneeFilter(event.target.value)} className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-600"><option value="all">All designated people</option>{assignees.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</select>
+        <select value={priorityFilter} onChange={(event) => setPriorityFilter(event.target.value)} className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-600"><option value="all">All priorities</option>{Object.keys(priorityStyles).map((priority) => <option key={priority} value={priority}>{priority}</option>)}</select>
+        <select value={labelFilter} onChange={(event) => setLabelFilter(event.target.value)} className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-600"><option value="all">All labels</option>{availableLabels.map((label) => <option key={label.id} value={label.id}>{label.name}</option>)}</select>
+      </div>
     <div className="overflow-x-auto pb-4">
       <div className="grid min-w-[76rem] grid-cols-5 gap-4">
         {columns.map((column, columnIndex) => (
@@ -128,6 +154,7 @@ export default function AdminBoard({ tasks, onTasksChange, onError, onOpenTask, 
                   </div>
                   <h3 className="mt-3 text-sm font-bold leading-5 text-ink">{task.title}</h3>
                   {task.description && <p className="mt-2 line-clamp-3 text-xs leading-5 text-slate-500">{task.description}</p>}
+                  {task.labels.length > 0 && <div className="mt-3 flex flex-wrap gap-1.5">{task.labels.map((label) => <span key={label.id} className="rounded-full px-2 py-1 text-[0.6rem] font-bold" style={{ backgroundColor: `${label.color}1A`, color: label.color }}>{label.name}</span>)}</div>}
                   {task.due_at && (
                     <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-500">
                       <CalendarClock className="h-3.5 w-3.5" />
@@ -166,6 +193,7 @@ export default function AdminBoard({ tasks, onTasksChange, onError, onOpenTask, 
           </section>
         ))}
       </div>
+    </div>
     </div>
   );
 }

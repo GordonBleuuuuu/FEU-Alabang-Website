@@ -63,7 +63,7 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
     const position = tasks.filter((task) => task.status === values.status).length;
     const { data, error } = await supabase.from("tasks").insert({ ...values, position }).select("id,task_key,title,description,status,priority,assignee_id,due_at,position,event_id").single();
     if (error) throw error;
-    setTasks((current) => [...current, data as BoardTask]);
+    setTasks((current) => [...current, { ...(data as BoardTask), labels: [] }]);
     setShowTaskForm(false); setView("board"); showNotice("success", `Task SCC-${data.task_key} created.`);
   }
 
