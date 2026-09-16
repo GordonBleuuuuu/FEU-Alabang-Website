@@ -41,9 +41,10 @@ type AdminBoardProps = {
   onTasksChange: (tasks: BoardTask[]) => void;
   onError: (message: string) => void;
   onOpenTask: (task: BoardTask) => void;
+  assignees: Array<{ id: string; name: string }>;
 };
 
-export default function AdminBoard({ tasks, onTasksChange, onError, onOpenTask }: AdminBoardProps) {
+export default function AdminBoard({ tasks, onTasksChange, onError, onOpenTask, assignees }: AdminBoardProps) {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
@@ -134,8 +135,9 @@ export default function AdminBoard({ tasks, onTasksChange, onError, onOpenTask }
                     </p>
                   )}
                   <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
-                    <span className="grid h-7 w-7 place-items-center rounded-full bg-feu-green/10 text-feu-green" title={task.assignee_id ?? "Unassigned"}>
-                      <UserRound className="h-3.5 w-3.5" />
+                    <span className="inline-flex max-w-36 items-center gap-1.5 rounded-full bg-feu-green/10 px-2 py-1 text-xs font-semibold text-feu-green" title={assignees.find((person) => person.id === task.assignee_id)?.name ?? "Unassigned"}>
+                      <UserRound className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{assignees.find((person) => person.id === task.assignee_id)?.name ?? "Unassigned"}</span>
                     </span>
                     <div className="flex gap-1">
                       <button

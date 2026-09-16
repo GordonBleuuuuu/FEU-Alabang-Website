@@ -186,14 +186,14 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
     </div>
     {notice && <div role="status" className={`fixed right-5 top-5 z-[70] max-w-sm rounded-2xl px-5 py-4 text-sm font-semibold shadow-xl ${notice.kind === "success" ? "bg-feu-moss text-white" : "bg-red-600 text-white"}`}>{notice.text}</div>}
     {view === "overview" && <Overview metrics={metrics} tasks={tasks} events={events} role={currentRole} onOpenBoard={() => setView("board")} onOpenEvents={() => setView("events")} />}
-    {view === "board" && <AdminBoard tasks={tasks} onTasksChange={setTasks} onError={(message) => showNotice("error", message)} onOpenTask={setViewingTask} />}
+    {view === "board" && <AdminBoard tasks={tasks} onTasksChange={setTasks} onError={(message) => showNotice("error", message)} onOpenTask={setViewingTask} assignees={teamMembers.filter((member) => member.role !== "Public").map((member) => ({ id: member.id, name: member.display_name || member.email }))} />}
     {view === "events" && <EventManager role={currentRole} events={events} onEdit={setEditingEvent} onStatusChange={updateStatus} onSubmit={prepareSubmission} onDelete={setDeletingEvent} onCreate={() => setEditingEvent("new")} />}
     {view === "notifications" && <NotificationCenter notifications={notifications} onOpen={openNotification} />}
     {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} onSave={createTask} />}
     {editingEvent && <EventForm event={editingEvent === "new" ? null : editingEvent} organizations={organizations} onClose={() => setEditingEvent(null)} onSave={saveEvent} />}
     {viewingEvent && <EventDetailsDialog event={viewingEvent} onClose={() => setViewingEvent(null)} onOpenActions={() => { setViewingEvent(null); setView("events"); }} />}
     {deletingEvent && <DeleteEventDialog event={deletingEvent} onClose={() => setDeletingEvent(null)} onDelete={deleteEvent} />}
-    {viewingTask && <TaskDrawer task={viewingTask} teamMembers={teamMembers} events={events as LinkableEvent[]} onClose={() => setViewingTask(null)} onTaskUpdated={(updated) => { setTasks((items) => items.map((item) => item.id === updated.id ? updated : item)); setViewingTask(updated); showNotice("success", `Task SCC-${updated.task_key} updated.`); }} />}
+    {viewingTask && <TaskDrawer task={viewingTask} teamMembers={teamMembers} events={events as LinkableEvent[]} onClose={() => setViewingTask(null)} onTaskUpdated={(updated) => { setTasks((items) => items.map((item) => item.id === updated.id ? updated : item)); setViewingTask(updated); showNotice("success", `Task SCC-${updated.task_key} updated.`); }} onTaskDeleted={(deleted) => { setTasks((items) => items.filter((item) => item.id !== deleted.id)); setViewingTask(null); showNotice("success", `Task SCC-${deleted.task_key} was deleted.`); }} />}
     {conflictReview && <ConflictDialog review={conflictReview} onClose={() => setConflictReview(null)} onContinue={() => { void updateStatus(conflictReview.event, "submitted"); setConflictReview(null); }} />}
   </div>;
 }
