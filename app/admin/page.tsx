@@ -8,6 +8,7 @@ import AdminWorkspace, {
   type Organization,
 } from "@/components/admin/AdminWorkspace";
 import { type BoardTask } from "@/components/admin/AdminBoard";
+import { type TeamMember } from "@/components/admin/TaskDrawer";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -28,10 +29,10 @@ export default async function AdminPage() {
     return <AccessDenied message="Your account does not have access to the internal workspace." />;
   }
 
-  const [tasksResult, eventsResult, organizationsResult, membershipsResult, notificationsResult] = await Promise.all([
+  const [tasksResult, eventsResult, organizationsResult, membershipsResult, notificationsResult, teamMembersResult] = await Promise.all([
     supabase
       .from("tasks")
-      .select("id,task_key,title,description,status,priority,assignee_id,due_at,position")
+      .select("id,task_key,title,description,status,priority,assignee_id,due_at,position,event_id")
       .order("position", { ascending: true }),
     supabase
       .from("events")
@@ -40,9 +41,10 @@ export default async function AdminPage() {
     supabase.from("organizations").select("id,name,acronym,slug").eq("is_active", true).order("name"),
     supabase.from("organization_members").select("organization_id").eq("user_id", authData.user.id),
     supabase.from("notifications").select("id,title,message,event_id,read_at,created_at").order("created_at", { ascending: false }).limit(50),
+    supabase.from("users").select("id,display_name,email,role").in("role", ["SCC Executive", "SADU"]).order("display_name"),
   ]);
 
-  const loadError = tasksResult.error ?? eventsResult.error ?? organizationsResult.error ?? membershipsResult.error ?? notificationsResult.error;
+  const loadError = tasksResult.error ?? eventsResult.error ?? organizationsResult.error ?? membershipsResult.error ?? notificationsResult.error ?? teamMembersResult.error;
   const manageableOrganizationIds = new Set((membershipsResult.data ?? []).map((membership) => membership.organization_id));
   const organizations = profile.role === "SADU"
     ? organizationsResult.data ?? []
@@ -78,6 +80,7 @@ export default async function AdminPage() {
             initialEvents={(eventsResult.data ?? []) as ManagedEvent[]}
             organizations={organizations as Organization[]}
             initialNotifications={(notificationsResult.data ?? []) as Notification[]}
+            teamMembers={(teamMembersResult.data ?? []) as TeamMember[]}
           />
         )}
       </div>

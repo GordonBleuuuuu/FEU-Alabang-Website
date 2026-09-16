@@ -17,6 +17,7 @@ export type BoardTask = {
   assignee_id: string | null;
   due_at: string | null;
   position: number;
+  event_id: string | null;
 };
 
 const columns: { status: TaskStatus; title: string }[] = [
@@ -39,9 +40,10 @@ type AdminBoardProps = {
   tasks: BoardTask[];
   onTasksChange: (tasks: BoardTask[]) => void;
   onError: (message: string) => void;
+  onOpenTask: (task: BoardTask) => void;
 };
 
-export default function AdminBoard({ tasks, onTasksChange, onError }: AdminBoardProps) {
+export default function AdminBoard({ tasks, onTasksChange, onError, onOpenTask }: AdminBoardProps) {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
@@ -114,6 +116,7 @@ export default function AdminBoard({ tasks, onTasksChange, onError }: AdminBoard
                   draggable
                   onDragStart={() => setDraggedTaskId(task.id)}
                   onDragEnd={() => setDraggedTaskId(null)}
+                  onClick={() => onOpenTask(task)}
                   className={`cursor-grab rounded-xl border border-slate-200 bg-white p-4 shadow-sm active:cursor-grabbing ${draggedTaskId === task.id ? "opacity-50" : ""}`}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -138,7 +141,7 @@ export default function AdminBoard({ tasks, onTasksChange, onError }: AdminBoard
                       <button
                         type="button"
                         disabled={columnIndex === 0 || updatingId === task.id}
-                        onClick={() => void moveTask(task, -1)}
+                        onClick={(event) => { event.stopPropagation(); void moveTask(task, -1); }}
                         aria-label={`Move ${task.title} left`}
                         className="grid h-8 w-8 place-items-center rounded-lg text-slate-500 hover:bg-slate-100 disabled:opacity-30"
                       >
@@ -147,7 +150,7 @@ export default function AdminBoard({ tasks, onTasksChange, onError }: AdminBoard
                       <button
                         type="button"
                         disabled={columnIndex === columns.length - 1 || updatingId === task.id}
-                        onClick={() => void moveTask(task, 1)}
+                        onClick={(event) => { event.stopPropagation(); void moveTask(task, 1); }}
                         aria-label={`Move ${task.title} right`}
                         className="grid h-8 w-8 place-items-center rounded-lg text-slate-500 hover:bg-slate-100 disabled:opacity-30"
                       >

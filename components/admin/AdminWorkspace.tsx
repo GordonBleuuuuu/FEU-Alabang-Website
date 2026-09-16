@@ -3,6 +3,7 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { AlertTriangle, Bell, CalendarDays, CheckCircle2, ClipboardList, LayoutDashboard, MapPin, Pencil, Plus, Send, Sparkles, Upload, X } from "lucide-react";
 import AdminBoard, { type BoardTask, type TaskPriority, type TaskStatus } from "./AdminBoard";
+import TaskDrawer, { type LinkableEvent, type TeamMember } from "./TaskDrawer";
 import { createClient } from "@/lib/supabase/client";
 
 export type AppRole = "SCC Executive" | "SADU";
@@ -29,9 +30,9 @@ const tabs: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
 const eventSelect = "id,title,slug,description,organizer_name,organization_id,venue,starts_at,ends_at,status,is_public,registration_url,image_url,category,contact_name,contact_email,capacity,review_notes";
 const inputClass = "mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-feu-green focus:ring-2 focus:ring-feu-green/15";
 
-export default function AdminWorkspace({ currentRole, initialTasks, initialEvents, organizations, initialNotifications }: {
+export default function AdminWorkspace({ currentRole, initialTasks, initialEvents, organizations, initialNotifications, teamMembers }: {
   currentRole: AppRole; initialTasks: BoardTask[]; initialEvents: ManagedEvent[];
-  organizations: Organization[]; initialNotifications: Notification[];
+  organizations: Organization[]; initialNotifications: Notification[]; teamMembers: TeamMember[];
 }) {
   const [view, setView] = useState<View>("overview");
   const [tasks, setTasks] = useState(initialTasks);
@@ -41,6 +42,7 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
   const [editingEvent, setEditingEvent] = useState<ManagedEvent | "new" | null>(null);
   const [viewingEvent, setViewingEvent] = useState<ManagedEvent | null>(null);
   const [deletingEvent, setDeletingEvent] = useState<ManagedEvent | null>(null);
+  const [viewingTask, setViewingTask] = useState<BoardTask | null>(null);
   const [conflictReview, setConflictReview] = useState<{ event: ManagedEvent; conflicts: Conflict[] } | null>(null);
   const [notice, setNotice] = useState<{ kind: "success" | "error"; text: string } | null>(null);
 
@@ -59,7 +61,7 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
   async function createTask(values: { title: string; description: string; status: TaskStatus; priority: TaskPriority; due_at: string | null }) {
     const supabase = createClient();
     const position = tasks.filter((task) => task.status === values.status).length;
-    const { data, error } = await supabase.from("tasks").insert({ ...values, position }).select("id,task_key,title,description,status,priority,assignee_id,due_at,position").single();
+    const { data, error } = await supabase.from("tasks").insert({ ...values, position }).select("id,task_key,title,description,status,priority,assignee_id,due_at,position,event_id").single();
     if (error) throw error;
     setTasks((current) => [...current, data as BoardTask]);
     setShowTaskForm(false); setView("board"); showNotice("success", `Task SCC-${data.task_key} created.`);
@@ -184,13 +186,14 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
     </div>
     {notice && <div role="status" className={`fixed right-5 top-5 z-[70] max-w-sm rounded-2xl px-5 py-4 text-sm font-semibold shadow-xl ${notice.kind === "success" ? "bg-feu-moss text-white" : "bg-red-600 text-white"}`}>{notice.text}</div>}
     {view === "overview" && <Overview metrics={metrics} tasks={tasks} events={events} role={currentRole} onOpenBoard={() => setView("board")} onOpenEvents={() => setView("events")} />}
-    {view === "board" && <AdminBoard tasks={tasks} onTasksChange={setTasks} onError={(message) => showNotice("error", message)} />}
+    {view === "board" && <AdminBoard tasks={tasks} onTasksChange={setTasks} onError={(message) => showNotice("error", message)} onOpenTask={setViewingTask} />}
     {view === "events" && <EventManager role={currentRole} events={events} onEdit={setEditingEvent} onStatusChange={updateStatus} onSubmit={prepareSubmission} onDelete={setDeletingEvent} onCreate={() => setEditingEvent("new")} />}
     {view === "notifications" && <NotificationCenter notifications={notifications} onOpen={openNotification} />}
     {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} onSave={createTask} />}
     {editingEvent && <EventForm event={editingEvent === "new" ? null : editingEvent} organizations={organizations} onClose={() => setEditingEvent(null)} onSave={saveEvent} />}
     {viewingEvent && <EventDetailsDialog event={viewingEvent} onClose={() => setViewingEvent(null)} onOpenActions={() => { setViewingEvent(null); setView("events"); }} />}
     {deletingEvent && <DeleteEventDialog event={deletingEvent} onClose={() => setDeletingEvent(null)} onDelete={deleteEvent} />}
+    {viewingTask && <TaskDrawer task={viewingTask} teamMembers={teamMembers} events={events as LinkableEvent[]} onClose={() => setViewingTask(null)} onTaskUpdated={(updated) => { setTasks((items) => items.map((item) => item.id === updated.id ? updated : item)); setViewingTask(updated); showNotice("success", `Task SCC-${updated.task_key} updated.`); }} />}
     {conflictReview && <ConflictDialog review={conflictReview} onClose={() => setConflictReview(null)} onContinue={() => { void updateStatus(conflictReview.event, "submitted"); setConflictReview(null); }} />}
   </div>;
 }
