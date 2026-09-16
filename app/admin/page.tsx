@@ -8,6 +8,7 @@ import AdminWorkspace, {
   type Organization,
 } from "@/components/admin/AdminWorkspace";
 import { type BoardTask, type TaskLabel } from "@/components/admin/AdminBoard";
+import { type EquipmentRequest, type InventoryItem, type InventoryTransaction } from "@/components/admin/InventoryManager";
 import { type TeamMember } from "@/components/admin/TaskDrawer";
 import { createClient } from "@/lib/supabase/server";
 
@@ -29,7 +30,7 @@ export default async function AdminPage() {
     return <AccessDenied message="Your account does not have access to the internal workspace." />;
   }
 
-  const [tasksResult, eventsResult, organizationsResult, membershipsResult, notificationsResult, teamMembersResult] = await Promise.all([
+  const [tasksResult, eventsResult, organizationsResult, membershipsResult, notificationsResult, teamMembersResult, inventoryItemsResult, equipmentRequestsResult, inventoryTransactionsResult] = await Promise.all([
     supabase
       .from("tasks")
       .select("id,task_key,title,description,status,priority,assignee_id,due_at,position,event_id,task_label_links(task_labels(id,name,color))")
@@ -42,9 +43,12 @@ export default async function AdminPage() {
     supabase.from("organization_members").select("organization_id").eq("user_id", authData.user.id),
     supabase.from("notifications").select("id,title,message,event_id,read_at,created_at").order("created_at", { ascending: false }).limit(50),
     supabase.from("users").select("id,display_name,email,role").in("role", ["SCC Executive", "SADU"]).order("display_name"),
+    supabase.from("inventory_items").select("id,name,category,unit,quantity_on_hand,reorder_level,storage_location,notes,created_at").order("name"),
+    supabase.from("equipment_requests").select("id,organization_id,inventory_item_id,quantity_requested,needed_at,status,notes,created_at").order("created_at", { ascending: false }),
+    supabase.from("inventory_transactions").select("id,inventory_item_id,quantity_change,reason,organization_id,notes,created_at").order("created_at", { ascending: false }).limit(50),
   ]);
 
-  const loadError = tasksResult.error ?? eventsResult.error ?? organizationsResult.error ?? membershipsResult.error ?? notificationsResult.error ?? teamMembersResult.error;
+  const loadError = tasksResult.error ?? eventsResult.error ?? organizationsResult.error ?? membershipsResult.error ?? notificationsResult.error ?? teamMembersResult.error ?? inventoryItemsResult.error ?? equipmentRequestsResult.error ?? inventoryTransactionsResult.error;
   const manageableOrganizationIds = new Set((membershipsResult.data ?? []).map((membership) => membership.organization_id));
   const organizations = profile.role === "SADU"
     ? organizationsResult.data ?? []
@@ -86,6 +90,9 @@ export default async function AdminPage() {
             organizations={organizations as Organization[]}
             initialNotifications={(notificationsResult.data ?? []) as Notification[]}
             teamMembers={(teamMembersResult.data ?? []) as TeamMember[]}
+            initialInventoryItems={(inventoryItemsResult.data ?? []) as InventoryItem[]}
+            initialEquipmentRequests={(equipmentRequestsResult.data ?? []) as EquipmentRequest[]}
+            initialInventoryTransactions={(inventoryTransactionsResult.data ?? []) as InventoryTransaction[]}
           />
         )}
       </div>

@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
-import { AlertTriangle, Bell, CalendarDays, CheckCircle2, ClipboardList, LayoutDashboard, MapPin, Pencil, Plus, Send, Sparkles, Upload, X } from "lucide-react";
+import { AlertTriangle, Bell, Boxes, CalendarDays, CheckCircle2, ClipboardList, LayoutDashboard, MapPin, Pencil, Plus, Send, Sparkles, Upload, X } from "lucide-react";
 import AdminBoard, { type BoardTask, type TaskPriority, type TaskStatus } from "./AdminBoard";
+import InventoryManager, { type EquipmentRequest, type InventoryItem, type InventoryTransaction } from "./InventoryManager";
 import TaskDrawer, { type LinkableEvent, type TeamMember } from "./TaskDrawer";
 import { createClient } from "@/lib/supabase/client";
 
@@ -19,20 +20,21 @@ export type ManagedEvent = {
 export type Notification = { id: string; title: string; message: string; event_id: string | null; read_at: string | null; created_at: string };
 type Conflict = { event_id: string; event_title: string; event_venue: string | null; event_starts_at: string; event_ends_at: string; conflict_type: "venue" | "schedule" };
 type EventValues = Omit<ManagedEvent, "id" | "slug" | "status" | "image_url">;
-type View = "overview" | "board" | "events" | "notifications";
+type View = "overview" | "board" | "inventory" | "events" | "notifications";
 
 const tabs: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "board", label: "Project board", icon: ClipboardList },
+  { id: "inventory", label: "Inventory management", icon: Boxes },
   { id: "events", label: "Events", icon: CalendarDays },
   { id: "notifications", label: "Notifications", icon: Bell },
 ];
 const eventSelect = "id,title,slug,description,organizer_name,organization_id,venue,starts_at,ends_at,status,is_public,registration_url,image_url,category,contact_name,contact_email,capacity,review_notes";
 const inputClass = "mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-feu-green focus:ring-2 focus:ring-feu-green/15";
 
-export default function AdminWorkspace({ currentRole, initialTasks, initialEvents, organizations, initialNotifications, teamMembers }: {
+export default function AdminWorkspace({ currentRole, initialTasks, initialEvents, organizations, initialNotifications, teamMembers, initialInventoryItems, initialEquipmentRequests, initialInventoryTransactions }: {
   currentRole: AppRole; initialTasks: BoardTask[]; initialEvents: ManagedEvent[];
-  organizations: Organization[]; initialNotifications: Notification[]; teamMembers: TeamMember[];
+  organizations: Organization[]; initialNotifications: Notification[]; teamMembers: TeamMember[]; initialInventoryItems: InventoryItem[]; initialEquipmentRequests: EquipmentRequest[]; initialInventoryTransactions: InventoryTransaction[];
 }) {
   const [view, setView] = useState<View>("overview");
   const [tasks, setTasks] = useState(initialTasks);
@@ -187,6 +189,7 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
     {notice && <div role="status" className={`fixed right-5 top-5 z-[70] max-w-sm rounded-2xl px-5 py-4 text-sm font-semibold shadow-xl ${notice.kind === "success" ? "bg-feu-moss text-white" : "bg-red-600 text-white"}`}>{notice.text}</div>}
     {view === "overview" && <Overview metrics={metrics} tasks={tasks} events={events} role={currentRole} onOpenBoard={() => setView("board")} onOpenEvents={() => setView("events")} />}
     {view === "board" && <AdminBoard tasks={tasks} onTasksChange={setTasks} onError={(message) => showNotice("error", message)} onOpenTask={setViewingTask} assignees={teamMembers.filter((member) => member.role !== "Public").map((member) => ({ id: member.id, name: member.display_name || member.email }))} />}
+    {view === "inventory" && <InventoryManager initialItems={initialInventoryItems} initialRequests={initialEquipmentRequests} initialTransactions={initialInventoryTransactions} organizations={organizations} />}
     {view === "events" && <EventManager role={currentRole} events={events} onEdit={setEditingEvent} onStatusChange={updateStatus} onSubmit={prepareSubmission} onDelete={setDeletingEvent} onCreate={() => setEditingEvent("new")} />}
     {view === "notifications" && <NotificationCenter notifications={notifications} onOpen={openNotification} />}
     {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} onSave={createTask} />}
