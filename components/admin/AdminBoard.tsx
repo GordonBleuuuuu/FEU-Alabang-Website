@@ -43,6 +43,7 @@ type AdminBoardProps = {
 
 export default function AdminBoard({ tasks, onTasksChange, onError }: AdminBoardProps) {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   const groupedTasks = useMemo(
     () => Object.fromEntries(
@@ -56,12 +57,19 @@ export default function AdminBoard({ tasks, onTasksChange, onError }: AdminBoard
     const nextStatus = columns[currentIndex + direction]?.status;
     if (!nextStatus) return;
 
+    await moveTaskToStatus(task, nextStatus);
+  }
+
+  async function moveTaskToStatus(task: BoardTask, nextStatus: TaskStatus) {
+    if (task.status === nextStatus) return;
+
     setUpdatingId(task.id);
     const previousTasks = tasks;
-    onTasksChange(tasks.map((item) => item.id === task.id ? { ...item, status: nextStatus } : item));
+    const position = tasks.filter((item) => item.status === nextStatus).length;
+    onTasksChange(tasks.map((item) => item.id === task.id ? { ...item, status: nextStatus, position } : item));
 
     const supabase = createClient();
-    const { error } = await supabase.from("tasks").update({ status: nextStatus }).eq("id", task.id);
+    const { error } = await supabase.from("tasks").update({ status: nextStatus, position }).eq("id", task.id);
     if (error) {
       onTasksChange(previousTasks);
       onError(error.message);
@@ -75,6 +83,12 @@ export default function AdminBoard({ tasks, onTasksChange, onError }: AdminBoard
         {columns.map((column, columnIndex) => (
           <section
             key={column.status}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={() => {
+              const task = tasks.find((item) => item.id === draggedTaskId);
+              if (task) void moveTaskToStatus(task, column.status);
+              setDraggedTaskId(null);
+            }}
             className="min-h-[30rem] rounded-2xl border border-slate-200/80 bg-slate-100 p-3"
             aria-labelledby={`column-${column.status}`}
           >
@@ -95,7 +109,13 @@ export default function AdminBoard({ tasks, onTasksChange, onError }: AdminBoard
               )}
 
               {groupedTasks[column.status].map((task) => (
-                <article key={task.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <article
+                  key={task.id}
+                  draggable
+                  onDragStart={() => setDraggedTaskId(task.id)}
+                  onDragEnd={() => setDraggedTaskId(null)}
+                  className={`cursor-grab rounded-xl border border-slate-200 bg-white p-4 shadow-sm active:cursor-grabbing ${draggedTaskId === task.id ? "opacity-50" : ""}`}
+                >
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-black text-feu-teal">SCC-{task.task_key}</span>
                     <span className={`rounded-full px-2 py-1 text-[0.65rem] font-bold uppercase ${priorityStyles[task.priority]}`}>

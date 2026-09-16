@@ -40,6 +40,7 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<ManagedEvent | "new" | null>(null);
   const [viewingEvent, setViewingEvent] = useState<ManagedEvent | null>(null);
+  const [deletingEvent, setDeletingEvent] = useState<ManagedEvent | null>(null);
   const [conflictReview, setConflictReview] = useState<{ event: ManagedEvent; conflicts: Conflict[] } | null>(null);
   const [notice, setNotice] = useState<{ kind: "success" | "error"; text: string } | null>(null);
 
@@ -131,6 +132,33 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
     if (conflicts.length) setConflictReview({ event, conflicts }); else void updateStatus(event, "submitted");
   }
 
+  async function deleteEvent(event: ManagedEvent) {
+    const supabase = createClient();
+    const { data: attachments, error: attachmentsError } = await supabase
+      .from("event_attachments")
+      .select("storage_bucket,storage_path")
+      .eq("event_id", event.id);
+    if (attachmentsError) throw attachmentsError;
+
+    const filesByBucket = new Map<string, string[]>();
+    for (const attachment of attachments ?? []) {
+      const paths = filesByBucket.get(attachment.storage_bucket) ?? [];
+      paths.push(attachment.storage_path);
+      filesByBucket.set(attachment.storage_bucket, paths);
+    }
+    for (const [bucket, paths] of filesByBucket) {
+      const { error } = await supabase.storage.from(bucket).remove(paths);
+      if (error) throw error;
+    }
+
+    const { error } = await supabase.from("events").delete().eq("id", event.id);
+    if (error) throw error;
+    setEvents((items) => items.filter((item) => item.id !== event.id));
+    setDeletingEvent(null);
+    setViewingEvent((item) => item?.id === event.id ? null : item);
+    showNotice("success", `“${event.title}” and its attached files were deleted.`);
+  }
+
   async function markNotificationRead(notification: Notification) {
     if (notification.read_at) return;
     const supabase = createClient(); const readAt = new Date().toISOString();
@@ -157,11 +185,12 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
     {notice && <div role="status" className={`fixed right-5 top-5 z-[70] max-w-sm rounded-2xl px-5 py-4 text-sm font-semibold shadow-xl ${notice.kind === "success" ? "bg-feu-moss text-white" : "bg-red-600 text-white"}`}>{notice.text}</div>}
     {view === "overview" && <Overview metrics={metrics} tasks={tasks} events={events} role={currentRole} onOpenBoard={() => setView("board")} onOpenEvents={() => setView("events")} />}
     {view === "board" && <AdminBoard tasks={tasks} onTasksChange={setTasks} onError={(message) => showNotice("error", message)} />}
-    {view === "events" && <EventManager role={currentRole} events={events} onEdit={setEditingEvent} onStatusChange={updateStatus} onSubmit={prepareSubmission} onCreate={() => setEditingEvent("new")} />}
+    {view === "events" && <EventManager role={currentRole} events={events} onEdit={setEditingEvent} onStatusChange={updateStatus} onSubmit={prepareSubmission} onDelete={setDeletingEvent} onCreate={() => setEditingEvent("new")} />}
     {view === "notifications" && <NotificationCenter notifications={notifications} onOpen={openNotification} />}
     {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} onSave={createTask} />}
     {editingEvent && <EventForm event={editingEvent === "new" ? null : editingEvent} organizations={organizations} onClose={() => setEditingEvent(null)} onSave={saveEvent} />}
     {viewingEvent && <EventDetailsDialog event={viewingEvent} onClose={() => setViewingEvent(null)} onOpenActions={() => { setViewingEvent(null); setView("events"); }} />}
+    {deletingEvent && <DeleteEventDialog event={deletingEvent} onClose={() => setDeletingEvent(null)} onDelete={deleteEvent} />}
     {conflictReview && <ConflictDialog review={conflictReview} onClose={() => setConflictReview(null)} onContinue={() => { void updateStatus(conflictReview.event, "submitted"); setConflictReview(null); }} />}
   </div>;
 }
@@ -178,9 +207,9 @@ function Overview({ metrics, tasks, events, role, onOpenBoard, onOpenEvents }: {
 
 function OverviewPanel({ title, empty, emptyText, action, onAction, children }: { title: string; empty: boolean; emptyText: string; action: string; onAction: () => void; children: ReactNode }) { return <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-center justify-between"><h2 className="font-black text-ink">{title}</h2><button type="button" onClick={onAction} className="text-xs font-bold text-feu-green hover:underline">{action}</button></div>{empty ? <p className="mt-8 rounded-xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">{emptyText}</p> : <div className="mt-4">{children}</div>}</section>; }
 
-function EventManager({ role, events, onEdit, onStatusChange, onSubmit, onCreate }: { role: AppRole; events: ManagedEvent[]; onEdit: (event: ManagedEvent) => void; onStatusChange: (event: ManagedEvent, status: EventStatus, notes?: string | null) => void; onSubmit: (event: ManagedEvent) => void; onCreate: () => void }) {
+function EventManager({ role, events, onEdit, onStatusChange, onSubmit, onDelete, onCreate }: { role: AppRole; events: ManagedEvent[]; onEdit: (event: ManagedEvent) => void; onStatusChange: (event: ManagedEvent, status: EventStatus, notes?: string | null) => void; onSubmit: (event: ManagedEvent) => void; onDelete: (event: ManagedEvent) => void; onCreate: () => void }) {
   if (!events.length) return <div className="rounded-3xl border border-dashed border-feu-green/25 bg-white px-6 py-20 text-center"><CalendarDays className="mx-auto h-12 w-12 text-feu-green" /><h2 className="mt-5 text-xl font-black text-ink">No events yet</h2><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">Create an RSO event draft and send it through SADU approval.</p><button type="button" onClick={onCreate} className="btn-green mt-6"><Plus className="h-4 w-4" /> Create first event</button></div>;
-  return <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">{events.map((event) => { const editable = role === "SADU" || ["draft", "needs_changes"].includes(event.status); return <article key={event.id} className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-start justify-between gap-4"><EventStatus status={event.status} />{editable && <button type="button" onClick={() => onEdit(event)} className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-slate-100" aria-label={`Edit ${event.title}`}><Pencil className="h-4 w-4" /></button>}</div><h2 className="mt-5 text-lg font-black text-ink">{event.title}</h2><p className="mt-2 text-xs font-bold uppercase tracking-wide text-feu-teal">{event.organizer_name} · {event.category}</p><p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-500">{event.description || "No description provided."}</p>{event.review_notes && <p className="mt-4 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-900"><strong>SADU note:</strong> {event.review_notes}</p>}<div className="mt-auto space-y-1 pt-6 text-sm text-slate-600"><p className="font-semibold">{new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeStyle: "short" }).format(new Date(event.starts_at))}</p><p className="flex items-center gap-1 text-xs text-slate-400"><MapPin className="h-3.5 w-3.5" />{event.venue || "Venue to be announced"}</p></div><div className="mt-5 flex flex-wrap gap-2 border-t border-slate-100 pt-4">{role === "SCC Executive" && ["draft", "needs_changes"].includes(event.status) && <button type="button" onClick={() => onSubmit(event)} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-feu-green px-3 py-2.5 text-xs font-bold text-white"><Send className="h-3.5 w-3.5" /> Submit to SADU</button>}{role === "SADU" && event.status === "submitted" && <><button type="button" onClick={() => { const notes = window.prompt("What must the organization change?"); if (notes) onStatusChange(event, "needs_changes", notes); }} className="rounded-xl border border-amber-300 px-3 py-2.5 text-xs font-bold text-amber-800">Needs changes</button><button type="button" onClick={() => onStatusChange(event, "approved", null)} className="flex-1 rounded-xl bg-feu-green px-3 py-2.5 text-xs font-bold text-white">Approve</button></>}{role === "SADU" && event.status === "approved" && <button type="button" onClick={() => onStatusChange(event, "published")} className="flex-1 rounded-xl bg-gold-default px-3 py-2.5 text-xs font-bold text-feu-moss">Publish</button>}{role === "SADU" && event.status === "published" && <button type="button" onClick={() => onStatusChange(event, "completed")} className="flex-1 rounded-xl bg-feu-green px-3 py-2.5 text-xs font-bold text-white">Mark completed</button>}{role === "SADU" && !["completed", "cancelled"].includes(event.status) && <button type="button" onClick={() => onStatusChange(event, "cancelled")} className="rounded-xl border border-red-200 px-3 py-2.5 text-xs font-bold text-red-700">Cancel</button>}{editable && <button type="button" onClick={() => onEdit(event)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600">Edit</button>}</div></article>; })}</div>;
+  return <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">{events.map((event) => { const editable = role === "SADU" || ["draft", "needs_changes"].includes(event.status); return <article key={event.id} className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-start justify-between gap-4"><EventStatus status={event.status} />{editable && <button type="button" onClick={() => onEdit(event)} className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-slate-100" aria-label={`Edit ${event.title}`}><Pencil className="h-4 w-4" /></button>}</div><h2 className="mt-5 text-lg font-black text-ink">{event.title}</h2><p className="mt-2 text-xs font-bold uppercase tracking-wide text-feu-teal">{event.organizer_name} · {event.category}</p><p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-500">{event.description || "No description provided."}</p>{event.review_notes && <p className="mt-4 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-900"><strong>SADU note:</strong> {event.review_notes}</p>}<div className="mt-auto space-y-1 pt-6 text-sm text-slate-600"><p className="font-semibold">{new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeStyle: "short" }).format(new Date(event.starts_at))}</p><p className="flex items-center gap-1 text-xs text-slate-400"><MapPin className="h-3.5 w-3.5" />{event.venue || "Venue to be announced"}</p></div><div className="mt-5 flex flex-wrap gap-2 border-t border-slate-100 pt-4">{role === "SCC Executive" && ["draft", "needs_changes"].includes(event.status) && <button type="button" onClick={() => onSubmit(event)} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-feu-green px-3 py-2.5 text-xs font-bold text-white"><Send className="h-3.5 w-3.5" /> Submit to SADU</button>}{role === "SADU" && event.status === "submitted" && <><button type="button" onClick={() => { const notes = window.prompt("What must the organization change?"); if (notes) onStatusChange(event, "needs_changes", notes); }} className="rounded-xl border border-amber-300 px-3 py-2.5 text-xs font-bold text-amber-800">Needs changes</button><button type="button" onClick={() => onStatusChange(event, "approved", null)} className="flex-1 rounded-xl bg-feu-green px-3 py-2.5 text-xs font-bold text-white">Approve</button></>}{role === "SADU" && event.status === "approved" && <button type="button" onClick={() => onStatusChange(event, "published")} className="flex-1 rounded-xl bg-gold-default px-3 py-2.5 text-xs font-bold text-feu-moss">Publish</button>}{role === "SADU" && event.status === "published" && <button type="button" onClick={() => onStatusChange(event, "completed")} className="flex-1 rounded-xl bg-feu-green px-3 py-2.5 text-xs font-bold text-white">Mark completed</button>}{role === "SADU" && !["completed", "cancelled"].includes(event.status) && <button type="button" onClick={() => onStatusChange(event, "cancelled")} className="rounded-xl border border-red-200 px-3 py-2.5 text-xs font-bold text-red-700">Cancel</button>}{role === "SADU" && <button type="button" onClick={() => onDelete(event)} className="rounded-xl border border-red-200 px-3 py-2.5 text-xs font-bold text-red-700 hover:bg-red-50">Delete</button>}{editable && <button type="button" onClick={() => onEdit(event)} className="rounded-xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600">Edit</button>}</div></article>; })}</div>;
 }
 
 function NotificationCenter({ notifications, onOpen }: { notifications: Notification[]; onOpen: (notification: Notification) => void }) {
@@ -198,6 +227,25 @@ function EventDetailsDialog({ event, onClose, onOpenActions }: { event: ManagedE
     {event.review_notes && <div className="rounded-xl bg-amber-50 p-4 text-sm leading-6 text-amber-900"><strong>SADU review notes:</strong> {event.review_notes}</div>}
     <div className="flex justify-end gap-3 border-t border-slate-200 pt-5"><button type="button" onClick={onClose} className="rounded-xl px-5 py-3 text-sm font-bold text-slate-500">Close</button><button type="button" onClick={onOpenActions} className="btn-green">Open event review actions</button></div>
   </div></Dialog>;
+}
+
+function DeleteEventDialog({ event, onClose, onDelete }: { event: ManagedEvent; onClose: () => void; onDelete: (event: ManagedEvent) => Promise<void> }) {
+  const [confirmation, setConfirmation] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function confirmDelete() {
+    setDeleting(true);
+    setError(null);
+    try {
+      await onDelete(event);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "The event could not be deleted.");
+      setDeleting(false);
+    }
+  }
+
+  return <Dialog title="Delete event" subtitle="This is a permanent SADU-only action." onClose={onClose}><div className="space-y-5 p-6"><div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-900"><strong>“{event.title}” will be permanently deleted.</strong> Its audit records, notifications, and uploaded files will be removed. Linked tasks remain, but their event link will be cleared.</div><label className="block text-sm font-bold text-ink">Type <span className="font-black text-red-700">DELETE</span> to continue<input value={confirmation} onChange={(input) => setConfirmation(input.target.value)} className={inputClass} autoComplete="off" /></label>{error && <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p>}<div className="flex justify-end gap-3 border-t border-slate-200 pt-5"><button type="button" onClick={onClose} disabled={deleting} className="rounded-xl px-5 py-3 text-sm font-bold text-slate-500">Keep event</button><button type="button" disabled={confirmation !== "DELETE" || deleting} onClick={() => void confirmDelete()} className="rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{deleting ? "Deleting…" : "Delete permanently"}</button></div></div></Dialog>;
 }
 function ConflictDialog({ review, onClose, onContinue }: { review: { event: ManagedEvent; conflicts: Conflict[] }; onClose: () => void; onContinue: () => void }) { return <Dialog title="Schedule conflicts found" subtitle="Review these overlaps before submitting to SADU." onClose={onClose}><div className="space-y-4 p-6"><div className="flex gap-3 rounded-xl bg-amber-50 p-4 text-sm text-amber-900"><AlertTriangle className="h-5 w-5 shrink-0" /><p>{review.conflicts.length} overlapping event{review.conflicts.length === 1 ? "" : "s"} found. Venue conflicts need special attention.</p></div>{review.conflicts.map((conflict) => <div key={conflict.event_id} className="rounded-xl border border-slate-200 bg-white p-4"><div className="flex justify-between gap-3"><p className="font-bold text-ink">{conflict.event_title}</p><span className={`rounded-full px-2 py-1 text-[0.6rem] font-black uppercase ${conflict.conflict_type === "venue" ? "bg-red-100 text-red-700" : "bg-sky-100 text-sky-700"}`}>{conflict.conflict_type} conflict</span></div><p className="mt-2 text-xs text-slate-500">{new Intl.DateTimeFormat("en-PH", { dateStyle: "medium", timeStyle: "short" }).format(new Date(conflict.event_starts_at))} · {conflict.event_venue || "No venue"}</p></div>)}<div className="flex justify-end gap-3 border-t border-slate-200 pt-5"><button type="button" onClick={onClose} className="rounded-xl px-4 py-3 text-sm font-bold text-slate-500">Go back and edit</button><button type="button" onClick={onContinue} className="btn-green">Submit anyway</button></div></div></Dialog>; }
 function EventStatus({ status }: { status: EventStatus }) { const styles: Record<EventStatus, string> = { draft: "bg-slate-100 text-slate-600", submitted: "bg-sky-100 text-sky-700", needs_changes: "bg-amber-100 text-amber-800", approved: "bg-teal-100 text-teal-800", published: "bg-emerald-100 text-emerald-800", completed: "bg-violet-100 text-violet-700", cancelled: "bg-red-100 text-red-700" }; return <span className={`rounded-full px-3 py-1 text-[0.65rem] font-black uppercase tracking-wide ${styles[status]}`}>{status.replace("_", " ")}</span>; }
