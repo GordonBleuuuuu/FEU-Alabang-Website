@@ -42,9 +42,26 @@ export default function UpdatePasswordPage() {
     setIsSubmitting(true);
     setError(null);
     const supabase = createClient();
-    const { error: updateError } = await supabase.auth.updateUser({ password });
+    const { data: updateData, error: updateError } = await supabase.auth.updateUser({ password });
 
-    if (updateError) setError(updateError.message);
+    if (updateError) {
+      setError(updateError.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Do not show a successful setup message until the new credential has
+    // actually been accepted by Auth. This prevents a misleading success UI
+    // if a browser session or recovery token has gone stale.
+    const email = updateData.user.email;
+    if (!email) {
+      setError("Your password could not be verified. Please request a new recovery link.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const { error: verificationError } = await supabase.auth.signInWithPassword({ email, password });
+    if (verificationError) setError("Your password was not accepted. Please request a new recovery link.");
     else setSuccess(true);
     setIsSubmitting(false);
   }
