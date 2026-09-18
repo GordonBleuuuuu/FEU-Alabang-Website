@@ -3,7 +3,7 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { AlertTriangle, Bell, Boxes, CalendarDays, CheckCircle2, ClipboardList, LayoutDashboard, MapPin, Pencil, Plus, Send, Sparkles, Upload, X } from "lucide-react";
 import AdminBoard, { type BoardTask, type TaskPriority, type TaskStatus } from "./AdminBoard";
-import InventoryManager, { type EquipmentRequest, type InventoryItem, type InventoryTransaction } from "./InventoryManager";
+import InventoryManager, { type EquipmentRequest, type InventoryItem, type InventoryLoan, type InventoryTransaction } from "./InventoryManager";
 import TaskDrawer, { type LinkableEvent, type TeamMember } from "./TaskDrawer";
 import { createClient } from "@/lib/supabase/client";
 
@@ -32,9 +32,9 @@ const tabs: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
 const eventSelect = "id,title,slug,description,organizer_name,organization_id,venue,starts_at,ends_at,status,is_public,registration_url,image_url,category,contact_name,contact_email,capacity,review_notes";
 const inputClass = "mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-slate-400 focus:border-feu-green focus:ring-2 focus:ring-feu-green/15";
 
-export default function AdminWorkspace({ currentRole, initialTasks, initialEvents, organizations, initialNotifications, teamMembers, initialInventoryItems, initialEquipmentRequests, initialInventoryTransactions }: {
+export default function AdminWorkspace({ currentRole, initialTasks, initialEvents, organizations, initialNotifications, teamMembers, initialInventoryItems, initialEquipmentRequests, initialInventoryTransactions, initialInventoryLoans }: {
   currentRole: AppRole; initialTasks: BoardTask[]; initialEvents: ManagedEvent[];
-  organizations: Organization[]; initialNotifications: Notification[]; teamMembers: TeamMember[]; initialInventoryItems: InventoryItem[]; initialEquipmentRequests: EquipmentRequest[]; initialInventoryTransactions: InventoryTransaction[];
+  organizations: Organization[]; initialNotifications: Notification[]; teamMembers: TeamMember[]; initialInventoryItems: InventoryItem[]; initialEquipmentRequests: EquipmentRequest[]; initialInventoryTransactions: InventoryTransaction[]; initialInventoryLoans: InventoryLoan[];
 }) {
   const [view, setView] = useState<View>("overview");
   const [tasks, setTasks] = useState(initialTasks);
@@ -189,7 +189,7 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
     {notice && <div role="status" className={`fixed right-5 top-5 z-[70] max-w-sm rounded-2xl px-5 py-4 text-sm font-semibold shadow-xl ${notice.kind === "success" ? "bg-feu-moss text-white" : "bg-red-600 text-white"}`}>{notice.text}</div>}
     {view === "overview" && <Overview metrics={metrics} tasks={tasks} events={events} role={currentRole} onOpenBoard={() => setView("board")} onOpenEvents={() => setView("events")} />}
     {view === "board" && <AdminBoard tasks={tasks} onTasksChange={setTasks} onError={(message) => showNotice("error", message)} onOpenTask={setViewingTask} assignees={teamMembers.filter((member) => member.role !== "Public").map((member) => ({ id: member.id, name: member.display_name || member.email }))} />}
-    {view === "inventory" && <InventoryManager initialItems={initialInventoryItems} initialRequests={initialEquipmentRequests} initialTransactions={initialInventoryTransactions} organizations={organizations} />}
+    {view === "inventory" && <InventoryManager initialItems={initialInventoryItems} initialRequests={initialEquipmentRequests} initialTransactions={initialInventoryTransactions} initialLoans={initialInventoryLoans} organizations={organizations} teamMembers={teamMembers} />}
     {view === "events" && <EventManager role={currentRole} events={events} onEdit={setEditingEvent} onStatusChange={updateStatus} onSubmit={prepareSubmission} onDelete={setDeletingEvent} onCreate={() => setEditingEvent("new")} />}
     {view === "notifications" && <NotificationCenter notifications={notifications} onOpen={openNotification} />}
     {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} onSave={createTask} />}
