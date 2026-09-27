@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
-import { AlertTriangle, Bell, Boxes, CalendarDays, CheckCircle2, ClipboardList, LayoutDashboard, MapPin, Pencil, Plus, Send, Sparkles, Upload, X } from "lucide-react";
+import { AlertTriangle, Bell, Boxes, CalendarDays, CheckCircle2, ClipboardList, LayoutDashboard, MapPin, Pencil, Plus, Send, Sparkles, Upload, Wallet, X } from "lucide-react";
 import AdminBoard, { type BoardTask, type TaskPriority, type TaskStatus } from "./AdminBoard";
 import InventoryManager, { type EquipmentRequest, type InventoryItem, type InventoryLoan, type InventoryTransaction } from "./InventoryManager";
+import FinanceManager from "./FinanceManager";
 import TaskDrawer, { type LinkableEvent, type TeamMember } from "./TaskDrawer";
 import { createClient } from "@/lib/supabase/client";
 
@@ -20,12 +21,13 @@ export type ManagedEvent = {
 export type Notification = { id: string; title: string; message: string; event_id: string | null; read_at: string | null; created_at: string };
 type Conflict = { event_id: string; event_title: string; event_venue: string | null; event_starts_at: string; event_ends_at: string; conflict_type: "venue" | "schedule" };
 type EventValues = Omit<ManagedEvent, "id" | "slug" | "status" | "image_url">;
-type View = "overview" | "board" | "inventory" | "events" | "notifications";
+type View = "overview" | "board" | "inventory" | "finance" | "events" | "notifications";
 
 const tabs: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "board", label: "Project board", icon: ClipboardList },
   { id: "inventory", label: "Inventory management", icon: Boxes },
+  { id: "finance", label: "Financial management", icon: Wallet },
   { id: "events", label: "Events", icon: CalendarDays },
   { id: "notifications", label: "Notifications", icon: Bell },
 ];
@@ -189,7 +191,8 @@ export default function AdminWorkspace({ currentRole, initialTasks, initialEvent
     {notice && <div role="status" className={`fixed right-5 top-5 z-[70] max-w-sm rounded-2xl px-5 py-4 text-sm font-semibold shadow-xl ${notice.kind === "success" ? "bg-feu-moss text-white" : "bg-red-600 text-white"}`}>{notice.text}</div>}
     {view === "overview" && <Overview metrics={metrics} tasks={tasks} events={events} role={currentRole} onOpenBoard={() => setView("board")} onOpenEvents={() => setView("events")} />}
     {view === "board" && <AdminBoard tasks={tasks} onTasksChange={setTasks} onError={(message) => showNotice("error", message)} onOpenTask={setViewingTask} assignees={teamMembers.filter((member) => member.role !== "Public").map((member) => ({ id: member.id, name: member.display_name || member.email }))} />}
-    {view === "inventory" && <InventoryManager initialItems={initialInventoryItems} initialRequests={initialEquipmentRequests} initialTransactions={initialInventoryTransactions} initialLoans={initialInventoryLoans} organizations={organizations} teamMembers={teamMembers} />}
+    {view === "inventory" && <InventoryManager initialItems={initialInventoryItems} initialRequests={initialEquipmentRequests} initialTransactions={initialInventoryTransactions} initialLoans={initialInventoryLoans} organizations={organizations} teamMembers={teamMembers} currentRole={currentRole} />}
+    {view === "finance" && <FinanceManager portalEvents={events} teamMembers={teamMembers} currentRole={currentRole} />}
     {view === "events" && <EventManager role={currentRole} events={events} onEdit={setEditingEvent} onStatusChange={updateStatus} onSubmit={prepareSubmission} onDelete={setDeletingEvent} onCreate={() => setEditingEvent("new")} />}
     {view === "notifications" && <NotificationCenter notifications={notifications} onOpen={openNotification} />}
     {showTaskForm && <TaskForm onClose={() => setShowTaskForm(false)} onSave={createTask} />}
