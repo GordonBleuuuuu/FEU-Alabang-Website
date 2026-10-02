@@ -30,7 +30,8 @@ export default function LoginPage() {
         return;
       }
 
-      router.replace("/admin");
+      const next = new URLSearchParams(window.location.search).get("next");
+      router.replace(next && next.startsWith("/") && !next.startsWith("//") ? next : "/admin");
       router.refresh();
     } catch {
       setError("Authentication is not configured. Please contact the site administrator.");

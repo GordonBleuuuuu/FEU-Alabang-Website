@@ -21,6 +21,14 @@ Built with **Next.js (App Router)**, **Tailwind CSS**, and **lucide-react**. Des
 
 ## 🚀 Getting started
 
+### SCC ID verification
+
+Apply `supabase/migrations/202610020001_scc_id_verification.sql` to the connected Supabase project before using the ID feature. The migration loads the 8 Batch 6 executives from `data/leadership.js` and 19 approved committee members from `ACCEPTED_COMMITTEES` in `data/committees.js`. These are a snapshot of the current files; later roster changes require an update in the internal ID page.
+
+Authorized SCC Executive and SADU accounts can open `/admin/passes` to add or edit an SCC ID, attach a photo URL, download its QR image, or revoke it. Scanning the QR opens `/verify/<token>`; staff sign in and compare the displayed record and photo with the person presenting the ID. Committee members do not have photos in the current source files, so add their approved photos before using the QR page as a visual identity check.
+
+Generate the QR images from the ID manager **after** the site is deployed at its final domain. The QR images previously made from plain `SCC-B6-###` codes do not open the verification page. Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS origin if staff will manage IDs from a different host or a local development server. Confirm each holder's full name and role before printing.
+
 ```bash
 # 1. Install dependencies
 npm install
