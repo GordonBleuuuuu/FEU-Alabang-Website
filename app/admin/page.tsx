@@ -73,6 +73,7 @@ export default async function AdminPage() {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/admin/passes" className="text-sm font-bold text-feu-green hover:underline">SCC IDs</Link>
+            <Link href="/admin/change-password" className="text-sm font-bold text-feu-green hover:underline">Change password</Link>
             <Link href="/" className="text-sm font-bold text-feu-green hover:underline">View public calendar</Link>
             <form action="/auth/signout" method="post">
               <button type="submit" className="text-sm font-bold text-slate-500 hover:text-ink">Sign out</button>

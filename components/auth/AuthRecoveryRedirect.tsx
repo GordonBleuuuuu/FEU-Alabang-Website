@@ -2,12 +2,13 @@
 
 import { useEffect } from "react";
 
-/** Routes Supabase recovery links that used the former public-site URL. */
+/** Routes recovery links that land at the project's default Site URL. */
 export default function AuthRecoveryRedirect() {
   useEffect(() => {
     const hash = window.location.hash;
-    if (hash.includes("type=recovery")) {
-      window.location.replace(`/auth/update-password${hash}`);
+    const search = window.location.search;
+    if (hash.includes("type=recovery") || new URLSearchParams(search).has("code")) {
+      window.location.replace(`/auth/update-password${search}${hash}`);
     }
   }, []);
 

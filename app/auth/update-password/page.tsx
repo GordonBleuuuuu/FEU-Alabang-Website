@@ -14,15 +14,11 @@ export default function UpdatePasswordPage() {
 
   useEffect(() => {
     const supabase = createClient();
-
-    const loadSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setIsRecoverySession(Boolean(data.session));
-    };
-
-    void loadSession();
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || session) setIsRecoverySession(Boolean(session));
+      // A normal signed-in session must use the workspace form, which asks for
+      // the current password. Only an accepted recovery link opens this form.
+      if (event === "PASSWORD_RECOVERY") setIsRecoverySession(Boolean(session));
+      if (event === "INITIAL_SESSION") setIsRecoverySession((current) => current === true ? true : false);
     });
 
     return () => listener.subscription.unsubscribe();
@@ -83,13 +79,14 @@ export default function UpdatePasswordPage() {
 
         {isRecoverySession === false && (
           <div className="mt-7 rounded-xl border border-red-300/30 bg-red-400/10 px-4 py-3 text-sm leading-6 text-red-100">
-            This setup link is invalid or has expired. Ask an administrator to send a new password-recovery email.
+            This reset link is invalid or has expired. Request a new link from the sign-in page.
+            <Link href="/login" className="mt-3 block font-bold text-gold-default hover:text-gold-light">Go to sign in →</Link>
           </div>
         )}
 
         {isRecoverySession && !success && (
           <form onSubmit={updatePassword} className="mt-7 space-y-5">
-            <p className="text-sm leading-6 text-white/65">Choose a password with at least eight characters, then use it to sign in to the executive workspace.</p>
+            <p className="text-sm leading-6 text-white/65">Choose a password with at least eight characters, then use it to sign in to the SCC or SADU workspace.</p>
             <label className="block">
               <span className="mb-2 block text-sm font-bold">New password</span>
               <input name="password" type="password" autoComplete="new-password" required minLength={8} className="w-full rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-white outline-none placeholder:text-white/35 focus:border-gold-default focus:ring-2 focus:ring-gold-default/25" placeholder="At least 8 characters" />
@@ -108,7 +105,7 @@ export default function UpdatePasswordPage() {
 
         {success && (
           <div className="mt-7 rounded-xl border border-emerald-200/25 bg-emerald-300/10 px-4 py-4 text-sm leading-6 text-emerald-50">
-            Password saved. You can now sign in to the executive workspace.
+            Password saved. You can now sign in to the SCC or SADU workspace.
             <Link href="/login" className="mt-3 block font-bold text-gold-default hover:text-gold-light">Go to sign in →</Link>
           </div>
         )}
