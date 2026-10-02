@@ -11,7 +11,7 @@
 // is calculated from APPLICATION_WINDOWS below.
 export const APPLICATIONS_ENABLED = true;
 
-// Leadership applications remain open until manually closed.
+// Reopened committee and leadership applications remain open until manually closed.
 export const SHOW_COUNTDOWN = false;
 
 export const APPLICATION_WINDOWS = [
@@ -30,6 +30,23 @@ export const APPLICATION_WINDOWS = [
       "Finance Committee",
       "Technicals Committee",
       "Secretariat Committee",
+      "Board of Directors",
+      "Course Representative",
+    ],
+  },
+  {
+    label: "Reopened Committees & Leadership Positions",
+    opensAt: "2026-10-02T00:00:00+08:00",
+    closesAt: "2099-12-31T23:59:00+08:00",
+    eligibleCommittees: [
+      "Logistics Committee",
+      "Technicals Committee",
+      "Secretariat Committee",
+      "Creatives Committee",
+      "Publicity Committee",
+      "Finance Committee",
+      "Programs Committee",
+      "Documentation Committee",
       "Board of Directors",
       "Course Representative",
     ],
@@ -134,26 +151,26 @@ export const TIMELINE = [
   {
     step: "1",
     title: "Applications",
-    date: "Batch 1: Aug 19 – 23  ·  Batch 2: Aug 24 – 28, 2026",
+    date: "Reopened October 2, 2026",
     description:
-      "Submit your application in either the Batch 1 or Batch 2 window.",
+      "Submit your application for an open committee or leadership position.",
   },
   {
     step: "2",
     title: "Screening",
-    date: "August 24 – 28, 2026",
+    date: "Schedule to be announced",
     description: "The SCC reviews every submission carefully.",
   },
   {
     step: "3",
     title: "Interviews",
-    date: "August 25 – 28, 2026",
+    date: "Schedule to be announced",
     description: "Shortlisted applicants are invited to a short interview.",
   },
   {
     step: "4",
     title: "Announcement",
-    date: "September 1, 2026",
+    date: "Schedule to be announced",
     description: "Accepted committee members are notified via email.",
   },
 ];
@@ -374,6 +391,6 @@ export const FAQ = [
   },
   {
     q: "When will I hear back?",
-    a: "Shortlisted applicants receive an interview invite within a few days after applications close. Final decisions are announced by email on the announcement date.",
+    a: "Shortlisted applicants will receive an interview invitation by email. Final decisions will be announced by email after the review process.",
   },
 ];
